@@ -1,12 +1,10 @@
 package library.ui;
 
-import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTable;
 import java.awt.CardLayout;
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
 import java.awt.GridBagLayout;
@@ -43,9 +41,7 @@ public class TableCard extends JPanel {
         setOpaque(false);
         add(UIStyle.scroll(table), TABLE);
 
-        JPanel empty = new JPanel(new GridBagLayout());
-        empty.setBackground(Color.WHITE);
-        empty.setBorder(BorderFactory.createLineBorder(UIStyle.BORDER));
+        JPanel empty = new UIStyle.RoundedPanel(new GridBagLayout());
         JPanel inner = new JPanel();
         inner.setOpaque(false);
         inner.setLayout(new BoxLayout(inner, BoxLayout.Y_AXIS));

@@ -9,7 +9,6 @@ import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.FlowLayout;
 
 /**
@@ -27,9 +26,9 @@ public class StudentPanel extends NavigationPanel {
     /** Welcome text. */
     private final JLabel welcome = UIStyle.label("", UIStyle.HEADER, UIStyle.TEXT);
     /** Issued count badge text. */
-    private final JLabel issuedLabel = UIStyle.label("", UIStyle.SMALL_BOLD, UIStyle.ACCENT_DARK);
+    private final JLabel issuedLabel = UIStyle.label("", UIStyle.SMALL_BOLD, UIStyle.ACCENT_BRIGHT);
     /** Reserved count badge text. */
-    private final JLabel reservedLabel = UIStyle.label("", UIStyle.SMALL_BOLD, UIStyle.WARNING.darker());
+    private final JLabel reservedLabel = UIStyle.label("", UIStyle.SMALL_BOLD, UIStyle.PURPLE);
     /** Overdue count badge text. */
     private final JLabel overdueLabel = UIStyle.label("", UIStyle.SMALL_BOLD, UIStyle.DANGER);
 
@@ -54,11 +53,8 @@ public class StudentPanel extends NavigationPanel {
      * @return the bar
      */
     private JPanel buildWelcomeBar() {
-        JPanel bar = new JPanel(new BorderLayout());
-        bar.setBackground(Color.WHITE);
-        bar.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createMatteBorder(0, 0, 1, 0, UIStyle.BORDER),
-                BorderFactory.createEmptyBorder(10, 22, 10, 22)));
+        JPanel bar = UIStyle.glassBar(false, true);
+        bar.setBorder(BorderFactory.createEmptyBorder(10, 22, 10, 22));
         bar.add(welcome, BorderLayout.WEST);
         JPanel stats = new JPanel(new FlowLayout(FlowLayout.RIGHT, 18, 0));
         stats.setOpaque(false);
@@ -83,7 +79,7 @@ public class StudentPanel extends NavigationPanel {
         issuedLabel.setText("Books issued: " + issued);
         reservedLabel.setText("Reserved: " + reserved);
         overdueLabel.setText("Overdue: " + overdue);
-        overdueLabel.setForeground(overdue > 0 ? UIStyle.DANGER : UIStyle.MUTED);
+        overdueLabel.setForeground(overdue > 0 ? UIStyle.OVERDUE_TEXT : UIStyle.MUTED);
     }
 
     /**

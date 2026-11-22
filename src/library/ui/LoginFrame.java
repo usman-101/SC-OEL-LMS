@@ -71,11 +71,11 @@ public class LoginFrame extends JFrame {
         setSize(UIStyle.MIN_WINDOW);
         setLocationRelativeTo(null);
 
-        JPanel root = new JPanel(new GridLayout(1, 2));
+        JPanel root = new GlassBackground(new GridLayout(1, 2));
         root.add(new BrandingPanel());
 
         JPanel right = new JPanel(new GridBagLayout());
-        right.setBackground(UIStyle.BACKGROUND);
+        right.setOpaque(false);
         UIStyle.RoundedPanel card = new UIStyle.RoundedPanel(new BorderLayout());
         card.setBorder(BorderFactory.createEmptyBorder(28, 34, 28, 34));
         card.setPreferredSize(new Dimension(440, 610));
@@ -102,7 +102,7 @@ public class LoginFrame extends JFrame {
         p.setOpaque(false);
         p.setLayout(new BoxLayout(p, BoxLayout.Y_AXIS));
 
-        addLeft(p, UIStyle.label("Welcome back", UIStyle.TITLE, UIStyle.TEXT));
+        addLeft(p, UIStyle.label("Welcome back", UIStyle.TITLE, Color.WHITE));
         addLeft(p, UIStyle.label("Sign in to continue to your library account", UIStyle.SMALL, UIStyle.MUTED));
         p.add(Box.createVerticalStrut(26));
 
@@ -128,7 +128,7 @@ public class LoginFrame extends JFrame {
         addLeft(p, fullWidth(signInButton));
         p.add(Box.createVerticalStrut(16));
 
-        addLeft(p, UIStyle.linkLabel("Don't have an account? <b><font color='#3B82F6'>Sign Up</font></b>",
+        addLeft(p, UIStyle.linkLabel("Don't have an account? <b><font color='#60A5FA'>Sign Up</font></b>",
                 this::showSignUp));
         p.add(Box.createVerticalGlue());
 
@@ -207,7 +207,8 @@ public class LoginFrame extends JFrame {
     }
 
     /**
-     * Left-hand branding panel with gradient background, title, tagline and feature list.
+     * Left-hand branding area: floating liquid-glass orbs, a large title with a blue-to-cyan
+     * gradient, a tagline and the feature list. It is transparent over the glowing background.
      *
      * @author Usman
      */
@@ -221,41 +222,102 @@ public class LoginFrame extends JFrame {
          */
         BrandingPanel() {
             setLayout(new GridBagLayout());
+            setOpaque(false);
             JPanel inner = new JPanel();
             inner.setOpaque(false);
             inner.setLayout(new BoxLayout(inner, BoxLayout.Y_AXIS));
 
-            JLabel logo = UIStyle.label("\uD83D\uDCDA", new java.awt.Font("Segoe UI Emoji", java.awt.Font.PLAIN, 54), Color.WHITE);
+            JLabel logo = UIStyle.label("\uD83D\uDCDA", new java.awt.Font("Segoe UI Emoji", java.awt.Font.PLAIN, 50), Color.WHITE);
             addLeft(inner, logo);
+            inner.add(Box.createVerticalStrut(14));
+            java.awt.Font big = new java.awt.Font(UIStyle.FONT_FAMILY, java.awt.Font.BOLD, 36);
+            addLeft(inner, UIStyle.label("Library Book", big, Color.WHITE));
+            addLeft(inner, new GradientLabel("Management System", big));
             inner.add(Box.createVerticalStrut(12));
-            addLeft(inner, UIStyle.label("Library Book", new java.awt.Font(UIStyle.FONT_FAMILY, java.awt.Font.BOLD, 34), Color.WHITE));
-            addLeft(inner, UIStyle.label("Management System", new java.awt.Font(UIStyle.FONT_FAMILY, java.awt.Font.BOLD, 34), Color.WHITE));
-            inner.add(Box.createVerticalStrut(12));
-            addLeft(inner, UIStyle.label("Organise books, members and loans in one place.", UIStyle.BODY, new Color(0xC7D2FE)));
+            addLeft(inner, UIStyle.label("Organise books, members and loans in one place.", UIStyle.BODY, new Color(0x9DB4D6)));
             inner.add(Box.createVerticalStrut(30));
             String[] features = {"Role-based Admin and Student panels", "Issue, return and reserve books",
                     "Overdue tracking and statistics", "Complete transaction history"};
             for (String f : features) {
-                addLeft(inner, UIStyle.iconLabel("\u2705", f, UIStyle.BODY, Color.WHITE));
+                JLabel item = UIStyle.label(f, UIStyle.BODY, UIStyle.TEXT);
+                item.setIcon(new UIStyle.LiquidDotIcon(10, UIStyle.ACCENT_BRIGHT));
+                item.setIconTextGap(12);
+                addLeft(inner, item);
                 inner.add(Box.createVerticalStrut(10));
             }
             add(inner);
         }
 
         /**
-         * Paints a navy-to-blue diagonal gradient background.
+         * Paints two floating liquid-glass orbs behind the text.
          *
          * @param g the graphics context
          */
         @Override
         protected void paintComponent(Graphics g) {
+            orb(g, getWidth() - 190, 40, 170);
+            orb(g, 30, getHeight() - 170, 110);
+        }
+
+        /**
+         * Paints one glass orb: translucent blue body, bright rim and a specular highlight.
+         *
+         * @param g    graphics
+         * @param x    left
+         * @param y    top
+         * @param size diameter
+         */
+        private static void orb(Graphics g, int x, int y, int size) {
             Graphics2D g2 = (Graphics2D) g.create();
             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-            g2.setPaint(new GradientPaint(0, 0, UIStyle.NAVY, getWidth(), getHeight(), new Color(0x1E40AF)));
-            g2.fillRect(0, 0, getWidth(), getHeight());
-            g2.setColor(new Color(255, 255, 255, 18));
-            g2.fillOval(getWidth() - 220, -80, 320, 320);
-            g2.fillOval(-120, getHeight() - 200, 300, 300);
+            g2.setPaint(new java.awt.RadialGradientPaint(new java.awt.geom.Point2D.Float(x + size * 0.35f, y + size * 0.3f),
+                    size * 0.8f, new float[]{0f, 0.6f, 1f},
+                    new Color[]{new Color(96, 165, 250, 70), new Color(37, 99, 235, 40), new Color(14, 30, 80, 20)}));
+            g2.fillOval(x, y, size, size);
+            g2.setStroke(new java.awt.BasicStroke(1.2f));
+            g2.setPaint(new GradientPaint(x, y, new Color(255, 255, 255, 120), x + size, y + size, new Color(96, 165, 250, 30)));
+            g2.drawOval(x, y, size, size);
+            g2.setPaint(new GradientPaint(x, y, new Color(255, 255, 255, 110), x, y + size * 0.4f, new Color(255, 255, 255, 0)));
+            g2.fillOval(x + size / 5, y + size / 14, size * 3 / 5, size * 2 / 7);
+            g2.dispose();
+        }
+    }
+
+    /**
+     * Label whose text is painted with a blue-to-cyan gradient.
+     *
+     * @author Usman
+     */
+    private static class GradientLabel extends JLabel {
+
+        /** Serialization version. */
+        private static final long serialVersionUID = 1L;
+
+        /**
+         * Creates the label.
+         *
+         * @param text the text
+         * @param font the font
+         */
+        GradientLabel(String text, java.awt.Font font) {
+            super(text);
+            setFont(font);
+        }
+
+        /**
+         * Paints the text with a horizontal gradient.
+         *
+         * @param g graphics
+         */
+        @Override
+        protected void paintComponent(Graphics g) {
+            Graphics2D g2 = (Graphics2D) g.create();
+            g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+            g2.setFont(getFont());
+            java.awt.FontMetrics fm = g2.getFontMetrics();
+            int w = fm.stringWidth(getText());
+            g2.setPaint(new GradientPaint(0, 0, UIStyle.ACCENT_BRIGHT, w, 0, UIStyle.CYAN));
+            g2.drawString(getText(), 0, fm.getAscent());
             g2.dispose();
         }
     }

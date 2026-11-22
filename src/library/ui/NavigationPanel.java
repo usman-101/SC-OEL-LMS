@@ -43,7 +43,7 @@ public abstract class NavigationPanel extends JPanel implements Refreshable {
         super(new BorderLayout());
         this.frame = frame;
         this.sidebar = new SidebarPanel(sidebarTitle);
-        content.setBackground(UIStyle.BACKGROUND);
+        content.setOpaque(false);
         content.setBorder(BorderFactory.createEmptyBorder(14, 22, 12, 22));
         add(sidebar, BorderLayout.WEST);
         add(content, BorderLayout.CENTER);
@@ -72,7 +72,7 @@ public abstract class NavigationPanel extends JPanel implements Refreshable {
     protected void setTopBar(javax.swing.JComponent bar) {
         remove(content);
         JPanel wrap = new JPanel(new BorderLayout());
-        wrap.setBackground(UIStyle.BACKGROUND);
+        wrap.setOpaque(false);
         wrap.add(bar, BorderLayout.NORTH);
         wrap.add(content, BorderLayout.CENTER);
         add(wrap, BorderLayout.CENTER);

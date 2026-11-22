@@ -17,8 +17,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Dark navy sidebar navigation used by the Admin and Student panels.
- * Items are flat buttons; the selected item is highlighted with an accent bar.
+ * Frosted dark glass sidebar navigation used by the Admin and Student panels.
+ * The selected item is shown as a glossy liquid-blue pill.
  *
  * @author Usman
  */
@@ -40,13 +40,13 @@ public class SidebarPanel extends JPanel {
      */
     public SidebarPanel(String sectionTitle) {
         super(new BorderLayout());
-        setBackground(UIStyle.NAVY);
+        setOpaque(false);
         setPreferredSize(new Dimension(215, 0));
         setBorder(BorderFactory.createEmptyBorder(18, 10, 14, 10));
 
         items.setOpaque(false);
         items.setLayout(new BoxLayout(items, BoxLayout.Y_AXIS));
-        javax.swing.JLabel title = UIStyle.label(sectionTitle, UIStyle.SMALL_BOLD, new Color(0x94A3B8));
+        javax.swing.JLabel title = UIStyle.label(sectionTitle, UIStyle.SMALL_BOLD, UIStyle.MUTED);
         title.setBorder(BorderFactory.createEmptyBorder(0, 12, 12, 0));
         title.setAlignmentX(Component.LEFT_ALIGNMENT);
         items.add(title);
@@ -56,6 +56,22 @@ public class SidebarPanel extends JPanel {
 
         add(items, BorderLayout.NORTH);
         add(bottom, BorderLayout.SOUTH);
+    }
+
+    /**
+     * Paints the frosted dark rail with a glowing blue hairline on its right edge.
+     *
+     * @param g the graphics context
+     */
+    @Override
+    protected void paintComponent(Graphics g) {
+        Graphics2D g2 = (Graphics2D) g.create();
+        g2.setPaint(new java.awt.GradientPaint(0, 0, new Color(6, 10, 20, 215), 0, getHeight(), new Color(8, 16, 34, 185)));
+        g2.fillRect(0, 0, getWidth(), getHeight());
+        g2.setPaint(new java.awt.GradientPaint(0, 0, new Color(96, 165, 250, 110), 0, getHeight(), new Color(96, 165, 250, 10)));
+        g2.fillRect(getWidth() - 1, 0, 1, getHeight());
+        g2.dispose();
+        super.paintComponent(g);
     }
 
     /**
@@ -136,7 +152,7 @@ public class SidebarPanel extends JPanel {
             setIcon(new UIStyle.EmojiIcon(icon, 15, Color.WHITE));
             setIconTextGap(10);
             setFont(UIStyle.BODY);
-            setForeground(new Color(0xE2E8F0));
+            setForeground(UIStyle.TEXT);
             setHorizontalAlignment(LEFT);
             setFocusPainted(false);
             setBorderPainted(false);
@@ -157,12 +173,12 @@ public class SidebarPanel extends JPanel {
         void setSelectedItem(boolean selected) {
             this.selectedItem = selected;
             setFont(selected ? UIStyle.BODY_BOLD : UIStyle.BODY);
-            setForeground(selected ? Color.WHITE : new Color(0xE2E8F0));
+            setForeground(selected ? Color.WHITE : UIStyle.TEXT);
             repaint();
         }
 
         /**
-         * Paints the hover/selected background and accent bar.
+         * Paints the hover glass or the selected liquid-blue pill.
          *
          * @param g the graphics context
          */
@@ -171,13 +187,20 @@ public class SidebarPanel extends JPanel {
             Graphics2D g2 = (Graphics2D) g.create();
             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
             if (selectedItem) {
-                g2.setColor(UIStyle.ACCENT);
-                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 10, 10);
-            } else if (getModel().isRollover()) {
-                g2.setColor(UIStyle.NAVY_LIGHT);
-                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 10, 10);
+                g2.setColor(UIStyle.alpha(UIStyle.ACCENT_BRIGHT, 45));
+                g2.setStroke(new java.awt.BasicStroke(3f));
+                g2.drawRoundRect(1, 1, getWidth() - 3, getHeight() - 3, 16, 16);
+                g2.dispose();
+                UIStyle.paintLiquid(g, 2, 2, getWidth() - 4, getHeight() - 4, 14, UIStyle.ACCENT, 0f);
+            } else {
+                if (getModel().isRollover()) {
+                    g2.setColor(new Color(255, 255, 255, 16));
+                    g2.fillRoundRect(2, 2, getWidth() - 4, getHeight() - 4, 14, 14);
+                    g2.setColor(new Color(255, 255, 255, 28));
+                    g2.drawRoundRect(2, 2, getWidth() - 5, getHeight() - 5, 14, 14);
+                }
+                g2.dispose();
             }
-            g2.dispose();
             super.paintComponent(g);
         }
     }

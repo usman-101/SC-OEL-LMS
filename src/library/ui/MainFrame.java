@@ -57,8 +57,7 @@ public class MainFrame extends JFrame {
         setLocationRelativeTo(null);
         setExtendedState(JFrame.MAXIMIZED_BOTH);
 
-        JPanel root = new JPanel(new BorderLayout());
-        root.setBackground(UIStyle.BACKGROUND);
+        JPanel root = new GlassBackground(new BorderLayout());
         root.add(buildHeader(), BorderLayout.NORTH);
         rolePanel = createRolePanel();
         root.add(rolePanel, BorderLayout.CENTER);
@@ -82,16 +81,13 @@ public class MainFrame extends JFrame {
      * @return the header
      */
     private JPanel buildHeader() {
-        JPanel header = new JPanel(new BorderLayout());
-        header.setBackground(Color.WHITE);
-        header.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createMatteBorder(0, 0, 1, 0, UIStyle.BORDER),
-                BorderFactory.createEmptyBorder(12, 22, 12, 22)));
+        JPanel header = UIStyle.glassBar(false, true);
+        header.setBorder(BorderFactory.createEmptyBorder(12, 22, 12, 22));
 
         JPanel left = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
         left.setOpaque(false);
-        left.add(UIStyle.label("\uD83D\uDCDA", new java.awt.Font("Segoe UI Emoji", java.awt.Font.PLAIN, 22), UIStyle.NAVY));
-        left.add(UIStyle.label("Library Book Management System", UIStyle.HEADER, UIStyle.NAVY));
+        left.add(UIStyle.label("\uD83D\uDCDA", new java.awt.Font("Segoe UI Emoji", java.awt.Font.PLAIN, 22), Color.WHITE));
+        left.add(UIStyle.label("Library Book Management System", UIStyle.HEADER, Color.WHITE));
         header.add(left, BorderLayout.WEST);
 
         JPanel right = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
@@ -99,7 +95,7 @@ public class MainFrame extends JFrame {
         right.add(UIStyle.label(user.getFullName(), UIStyle.BODY_BOLD, UIStyle.TEXT));
         right.add(UIStyle.label(user.getEmail(), UIStyle.SMALL, UIStyle.MUTED));
         right.add(UIStyle.badge(user.getRole() == Role.ADMIN ? "ADMIN / LIBRARIAN" : "STUDENT",
-                user.getRole() == Role.ADMIN ? UIStyle.ACCENT : UIStyle.SUCCESS));
+                user.getRole() == Role.ADMIN ? UIStyle.ACCENT : UIStyle.SUCCESS.darker()));
         header.add(right, BorderLayout.EAST);
         return header;
     }
@@ -110,11 +106,8 @@ public class MainFrame extends JFrame {
      * @return the status bar
      */
     private JPanel buildStatusBar() {
-        JPanel bar = new JPanel(new BorderLayout());
-        bar.setBackground(Color.WHITE);
-        bar.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createMatteBorder(1, 0, 0, 0, UIStyle.BORDER),
-                BorderFactory.createEmptyBorder(6, 16, 6, 16)));
+        JPanel bar = UIStyle.glassBar(true, false);
+        bar.setBorder(BorderFactory.createEmptyBorder(6, 16, 6, 16));
         bar.add(statusLabel, BorderLayout.WEST);
         JLabel version = UIStyle.label("Data folder: " + (system.getDataStore() == null ? "in-memory"
                 : system.getDataStore().getDataDir().toAbsolutePath()), UIStyle.SMALL, UIStyle.MUTED);
@@ -132,7 +125,7 @@ public class MainFrame extends JFrame {
     public void setStatus(String message, boolean error) {
         String time = LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss"));
         statusLabel.setText("[" + time + "]  " + message);
-        statusLabel.setForeground(error ? UIStyle.DANGER : UIStyle.SUCCESS.darker());
+        statusLabel.setForeground(error ? UIStyle.OVERDUE_TEXT : UIStyle.ACCENT_BRIGHT);
         if (statusTimer != null) statusTimer.stop();
         statusTimer = new Timer(6000, e -> statusLabel.setForeground(UIStyle.MUTED));
         statusTimer.setRepeats(false);

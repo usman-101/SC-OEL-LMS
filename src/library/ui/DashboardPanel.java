@@ -32,7 +32,7 @@ public class DashboardPanel extends JPanel implements Refreshable {
     /** Available books card. */
     private final StatCard availableCard = new StatCard("Available Books", "\u2714", UIStyle.SUCCESS);
     /** Issued books card. */
-    private final StatCard issuedCard = new StatCard("Issued Books", "\uD83D\uDCE4", UIStyle.NAVY);
+    private final StatCard issuedCard = new StatCard("Issued Books", "\uD83D\uDCD6", UIStyle.CYAN);
     /** Reserved books card. */
     private final StatCard reservedCard = new StatCard("Reserved Books", "\uD83D\uDD16", UIStyle.WARNING);
     /** Members card. */

@@ -128,7 +128,7 @@ public class IssueReturnPanel extends JPanel implements Refreshable {
         card.add(UIStyle.height(memberCombo, 34), c);
         c.gridx = 2;
         c.weightx = 0;
-        daysSpinner.setFont(UIStyle.BODY);
+        UIStyle.styleSpinner(daysSpinner);
         card.add(UIStyle.height(daysSpinner, 34), c);
         c.gridx = 3;
         c.insets = new Insets(0, 0, 4, 0);

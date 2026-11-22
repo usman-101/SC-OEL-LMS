@@ -1,20 +1,35 @@
 package library.ui;
 
 import javax.swing.BorderFactory;
+import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
+import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
+import javax.swing.JSpinner;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.ListCellRenderer;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
+import javax.swing.border.AbstractBorder;
 import javax.swing.border.Border;
+import javax.swing.plaf.ColorUIResource;
+import javax.swing.plaf.ComponentUI;
+import javax.swing.plaf.basic.BasicComboBoxUI;
+import javax.swing.plaf.basic.BasicComboPopup;
+import javax.swing.plaf.basic.BasicScrollBarUI;
+import javax.swing.plaf.basic.BasicSpinnerUI;
+import javax.swing.plaf.basic.ComboPopup;
+import javax.swing.plaf.metal.DefaultMetalTheme;
+import javax.swing.plaf.metal.MetalLookAndFeel;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
@@ -26,17 +41,23 @@ import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontMetrics;
+import java.awt.GradientPaint;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GraphicsEnvironment;
+import java.awt.Insets;
 import java.awt.LayoutManager;
+import java.awt.Rectangle;
 import java.awt.RenderingHints;
+import java.awt.Shape;
+import java.awt.geom.RoundRectangle2D;
 import java.util.Arrays;
 import java.util.function.IntPredicate;
 
 /**
- * Central place for the application's look: colour palette, fonts and factory methods
- * for consistently styled buttons, text fields, combo boxes, cards, tables and dialogs.
+ * Central place for the application's "liquid glass" look: a black and deep-blue palette,
+ * fonts, the Swing theme set-up, and factory methods for glass buttons, inputs, combo boxes,
+ * frosted cards, dark tables and dialogs. Every screen gets its look from this class.
  *
  * @author Usman
  */
@@ -44,42 +65,58 @@ public final class UIStyle {
 
     // ==================== COLOURS ====================
 
-    /** Dark navy used for the sidebar and branding. */
-    public static final Color NAVY = new Color(0x1F2A44);
-    /** Slightly lighter navy for sidebar hover/selection. */
-    public static final Color NAVY_LIGHT = new Color(0x2C3A5C);
-    /** Primary accent blue. */
-    public static final Color ACCENT = new Color(0x3B82F6);
-    /** Darker accent blue (hover). */
-    public static final Color ACCENT_DARK = new Color(0x2563EB);
-    /** Light grey application background. */
-    public static final Color BACKGROUND = new Color(0xF4F6FA);
-    /** White card background. */
-    public static final Color CARD = Color.WHITE;
-    /** Main text colour. */
-    public static final Color TEXT = new Color(0x1E293B);
+    /** Deepest background colour (near black). */
+    public static final Color BG_DEEP = new Color(0x04060C);
+    /** Solid dark surface used behind dialogs and popups. */
+    public static final Color SURFACE = new Color(0x0B1220);
+    /** Dark navy used for glass tints. */
+    public static final Color NAVY = new Color(0x0A1428);
+    /** Slightly lighter navy. */
+    public static final Color NAVY_LIGHT = new Color(0x13213D);
+    /** Primary accent blue (buttons, selection). */
+    public static final Color ACCENT = new Color(0x2563EB);
+    /** Bright blue for highlights, links and focus rings. */
+    public static final Color ACCENT_BRIGHT = new Color(0x60A5FA);
+    /** Darker accent blue. */
+    public static final Color ACCENT_DARK = new Color(0x1D4ED8);
+    /** Cyan highlight. */
+    public static final Color CYAN = new Color(0x22D3EE);
+    /** Application background (used where a solid colour is needed). */
+    public static final Color BACKGROUND = BG_DEEP;
+    /** Card colour (glass tint). */
+    public static final Color CARD = new Color(0x0F1A2E);
+    /** Main text colour (cool white). */
+    public static final Color TEXT = new Color(0xE6EDF7);
     /** Secondary (muted) text colour. */
-    public static final Color MUTED = new Color(0x64748B);
-    /** Border colour for inputs and cards. */
-    public static final Color BORDER = new Color(0xE2E8F0);
-    /** Green for success / available. */
-    public static final Color SUCCESS = new Color(0x10B981);
-    /** Amber for warnings / reserved. */
-    public static final Color WARNING = new Color(0xF59E0B);
-    /** Red for errors / overdue / delete. */
+    public static final Color MUTED = new Color(0x8A9BB8);
+    /** Hairline border colour (translucent white). */
+    public static final Color BORDER = new Color(255, 255, 255, 34);
+    /** Sky blue used for positive actions / available. */
+    public static final Color SUCCESS = new Color(0x0EA5E9);
+    /** Indigo used for status changes / reserved. */
+    public static final Color WARNING = new Color(0x6366F1);
+    /** Red used only for destructive actions and overdue items. */
     public static final Color DANGER = new Color(0xEF4444);
-    /** Purple for members. */
-    public static final Color PURPLE = new Color(0x8B5CF6);
-    /** Grey for neutral buttons. */
-    public static final Color NEUTRAL = new Color(0x94A3B8);
+    /** Violet-blue used for members. */
+    public static final Color PURPLE = new Color(0x818CF8);
+    /** Slate used for neutral buttons. */
+    public static final Color NEUTRAL = new Color(0x334155);
+    /** Input field background. */
+    public static final Color INPUT_BG = new Color(0x0A1222);
+    /** Table row colour. */
+    public static final Color ROW = new Color(0x0B1322);
     /** Alternate table row colour. */
-    public static final Color ROW_ALT = new Color(0xF8FAFC);
+    public static final Color ROW_ALT = new Color(0x0F192C);
+    /** Table header background. */
+    public static final Color HEADER_BG = new Color(0x0C1B36);
+    /** Table grid line colour. */
+    public static final Color GRID = new Color(0x18263F);
     /** Table selection colour. */
-    public static final Color SELECTION = new Color(0xDBEAFE);
+    public static final Color SELECTION = new Color(0x1E40AF);
     /** Background for highlighted (overdue) rows. */
-    public static final Color OVERDUE_ROW = new Color(0xFEE2E2);
+    public static final Color OVERDUE_ROW = new Color(0x3A0F18);
     /** Text colour for highlighted (overdue) rows. */
-    public static final Color OVERDUE_TEXT = new Color(0xB91C1C);
+    public static final Color OVERDUE_TEXT = new Color(0xFCA5A5);
 
     // ==================== FONTS ====================
 
@@ -123,27 +160,181 @@ public final class UIStyle {
     }
 
     /**
-     * Applies global Swing defaults (fonts, dialog colours) so standard components match the theme.
+     * Returns a colour with a new alpha value.
+     *
+     * @param c     the colour
+     * @param alpha alpha 0-255
+     * @return the translucent colour
+     */
+    public static Color alpha(Color c, int alpha) {
+        return new Color(c.getRed(), c.getGreen(), c.getBlue(), Math.max(0, Math.min(255, alpha)));
+    }
+
+    /**
+     * Mixes a colour towards white (positive amount) or black (negative amount).
+     *
+     * @param c      the colour
+     * @param amount -1..1
+     * @return the adjusted colour
+     */
+    public static Color shade(Color c, float amount) {
+        int target = amount >= 0 ? 255 : 0;
+        float a = Math.abs(amount);
+        return new Color(Math.round(c.getRed() + (target - c.getRed()) * a),
+                Math.round(c.getGreen() + (target - c.getGreen()) * a),
+                Math.round(c.getBlue() + (target - c.getBlue()) * a), c.getAlpha());
+    }
+
+    // ==================== THEME ====================
+
+    /**
+     * Installs the cross-platform (Metal) look and feel with the dark glass colours, so that
+     * dialogs, popups, check boxes and scroll bars match the theme. Call once at start-up,
+     * on the event dispatch thread, before creating any window.
+     */
+    public static void installTheme() {
+        try {
+            MetalLookAndFeel.setCurrentTheme(new DefaultMetalTheme());
+            UIManager.setLookAndFeel(new MetalLookAndFeel());
+        } catch (Exception e) {
+            // keep the default look and feel
+        }
+        applyGlobalDefaults();
+    }
+
+    /**
+     * Applies global Swing defaults (fonts and dark glass colours) for standard components
+     * such as JOptionPane, tool tips, popups and scroll bars.
      */
     public static void applyGlobalDefaults() {
+        ColorUIResource surface = new ColorUIResource(SURFACE);
+        ColorUIResource text = new ColorUIResource(TEXT);
+        ColorUIResource input = new ColorUIResource(INPUT_BG);
+        ColorUIResource sel = new ColorUIResource(SELECTION);
         UIManager.put("OptionPane.messageFont", BODY);
         UIManager.put("OptionPane.buttonFont", BODY_BOLD);
+        UIManager.put("OptionPane.background", surface);
+        UIManager.put("OptionPane.messageForeground", text);
+        UIManager.put("Panel.background", surface);
+        UIManager.put("control", surface);
         UIManager.put("Label.font", BODY);
+        UIManager.put("Label.foreground", text);
+        UIManager.put("Button.font", BODY_BOLD);
+        UIManager.put("Button.background", new ColorUIResource(ACCENT));
+        UIManager.put("Button.foreground", new ColorUIResource(Color.WHITE));
+        UIManager.put("Button.select", new ColorUIResource(ACCENT_DARK));
+        UIManager.put("Button.focus", new ColorUIResource(ACCENT_BRIGHT));
+        UIManager.put("Button.gradient", null);
+        UIManager.put("Button.border", BorderFactory.createEmptyBorder(8, 20, 8, 20));
         UIManager.put("ComboBox.font", BODY);
-        UIManager.put("TextField.font", BODY);
-        UIManager.put("PasswordField.font", BODY);
+        UIManager.put("ComboBox.background", input);
+        UIManager.put("ComboBox.foreground", text);
+        UIManager.put("ComboBox.selectionBackground", sel);
+        UIManager.put("ComboBox.selectionForeground", new ColorUIResource(Color.WHITE));
+        UIManager.put("List.background", input);
+        UIManager.put("List.foreground", text);
+        UIManager.put("List.selectionBackground", sel);
+        UIManager.put("List.selectionForeground", new ColorUIResource(Color.WHITE));
+        UIManager.put("PopupMenu.border", BorderFactory.createLineBorder(new Color(0x1E3A5F)));
+        UIManager.put("PopupMenu.background", input);
+        for (String k : new String[]{"TextField", "PasswordField", "FormattedTextField"}) {
+            UIManager.put(k + ".font", BODY);
+            UIManager.put(k + ".background", input);
+            UIManager.put(k + ".foreground", text);
+            UIManager.put(k + ".caretForeground", new ColorUIResource(ACCENT_BRIGHT));
+            UIManager.put(k + ".selectionBackground", sel);
+            UIManager.put(k + ".selectionForeground", new ColorUIResource(Color.WHITE));
+            UIManager.put(k + ".inactiveForeground", new ColorUIResource(MUTED));
+        }
         UIManager.put("CheckBox.font", SMALL);
+        UIManager.put("CheckBox.foreground", new ColorUIResource(MUTED));
+        UIManager.put("CheckBox.background", surface);
         UIManager.put("Spinner.font", BODY);
+        UIManager.put("Spinner.background", input);
+        UIManager.put("Spinner.foreground", text);
         UIManager.put("ToolTip.font", SMALL);
+        UIManager.put("ToolTip.background", new ColorUIResource(0x111B2E));
+        UIManager.put("ToolTip.foreground", text);
+        UIManager.put("ToolTip.border", BorderFactory.createLineBorder(new Color(0x1E3A5F)));
+        UIManager.put("ScrollPane.background", new ColorUIResource(ROW));
+        UIManager.put("Viewport.background", new ColorUIResource(ROW));
+        UIManager.put("Table.background", new ColorUIResource(ROW));
+        UIManager.put("Table.foreground", text);
+        UIManager.put("TableHeader.background", new ColorUIResource(HEADER_BG));
+        UIManager.put("ScrollBarUI", GlassScrollBarUI.class.getName());
+        UIManager.put("ScrollBar.width", 12);
+    }
+
+    // ==================== GLASS PAINTING ====================
+
+    /**
+     * Paints a frosted glass surface: dark tint, soft white gradient, gradient hairline border
+     * and a top sheen line.
+     *
+     * @param g      graphics
+     * @param w      width
+     * @param h      height
+     * @param radius corner radius
+     * @param tint   base tint colour (alpha is respected)
+     */
+    public static void paintGlass(Graphics g, int w, int h, int radius, Color tint) {
+        Graphics2D g2 = (Graphics2D) g.create();
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        Shape shape = new RoundRectangle2D.Float(0.5f, 0.5f, w - 1f, h - 1f, radius, radius);
+        g2.setColor(tint);
+        g2.fill(shape);
+        g2.setPaint(new GradientPaint(0, 0, new Color(255, 255, 255, 22), 0, h, new Color(255, 255, 255, 5)));
+        g2.fill(shape);
+        // sheen across the top third
+        g2.setClip(shape);
+        g2.setPaint(new GradientPaint(0, 0, new Color(255, 255, 255, 26), 0, Math.max(1, h / 3f), new Color(255, 255, 255, 0)));
+        g2.fillRect(0, 0, w, Math.max(1, h / 3));
+        g2.setClip(null);
+        g2.setStroke(new BasicStroke(1f));
+        g2.setPaint(new GradientPaint(0, 0, new Color(255, 255, 255, 70), 0, h, new Color(120, 170, 255, 22)));
+        g2.draw(shape);
+        g2.dispose();
+    }
+
+    /**
+     * Paints a glossy "liquid" pill in the given colour (used by buttons, badges and selected items).
+     *
+     * @param g      graphics
+     * @param x      left
+     * @param y      top
+     * @param w      width
+     * @param h      height
+     * @param arc    corner arc
+     * @param base   base colour
+     * @param bright extra brightness 0..1 (hover)
+     */
+    public static void paintLiquid(Graphics g, int x, int y, int w, int h, int arc, Color base, float bright) {
+        Graphics2D g2 = (Graphics2D) g.create();
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        Shape shape = new RoundRectangle2D.Float(x + 0.5f, y + 0.5f, w - 1f, h - 1f, arc, arc);
+        Color top = alpha(shade(base, 0.18f + bright), 235);
+        Color bottom = alpha(shade(base, -0.35f + bright / 2), 225);
+        g2.setPaint(new GradientPaint(0, y, top, 0, y + h, bottom));
+        g2.fill(shape);
+        g2.setClip(shape);
+        g2.setPaint(new GradientPaint(0, y, new Color(255, 255, 255, 95), 0, y + h * 0.55f, new Color(255, 255, 255, 0)));
+        g2.fill(new RoundRectangle2D.Float(x + 2, y + 1, w - 4f, h * 0.55f, arc, arc));
+        g2.setPaint(new GradientPaint(0, y + h * 0.6f, new Color(255, 255, 255, 0), 0, y + h, alpha(shade(base, 0.5f), 70)));
+        g2.fillRect(x, y + h / 2, w, h / 2);
+        g2.setClip(null);
+        g2.setStroke(new BasicStroke(1f));
+        g2.setPaint(new GradientPaint(0, y, new Color(255, 255, 255, 120), 0, y + h, alpha(shade(base, 0.3f), 90)));
+        g2.draw(shape);
+        g2.dispose();
     }
 
     // ==================== BUTTONS ====================
 
     /**
-     * Creates a flat, rounded, coloured button with hover effect and hand cursor.
+     * Creates a glossy liquid-glass pill button with hover glow and hand cursor.
      *
      * @param text  button text
-     * @param color background colour
+     * @param color base colour
      * @return the button
      */
     public static JButton createButton(String text, Color color) {
@@ -161,7 +352,8 @@ public final class UIStyle {
     }
 
     /**
-     * A flat button that paints a rounded background and darkens on hover/press.
+     * A liquid-glass pill button: translucent gradient body, glossy top highlight,
+     * light rim and a soft glow on hover.
      *
      * @author Usman
      */
@@ -169,11 +361,11 @@ public final class UIStyle {
 
         /** Serialization version. */
         private static final long serialVersionUID = 1L;
-        /** Base background colour. */
+        /** Base colour. */
         private final Color base;
 
         /**
-         * Creates a flat button.
+         * Creates a glass button.
          *
          * @param text  the text
          * @param color the base colour
@@ -189,29 +381,34 @@ public final class UIStyle {
             setOpaque(false);
             setRolloverEnabled(true);
             setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-            setBorder(BorderFactory.createEmptyBorder(9, 18, 9, 18));
+            setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
         }
 
         /**
-         * Paints the rounded background, then the text.
+         * Paints the glow (on hover), the liquid body and then the text.
          *
          * @param g the graphics context
          */
         @Override
         protected void paintComponent(Graphics g) {
-            Graphics2D g2 = (Graphics2D) g.create();
-            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-            Color c = base;
-            if (!isEnabled()) {
-                c = NEUTRAL;
-            } else if (getModel().isPressed()) {
-                c = base.darker().darker();
-            } else if (getModel().isRollover()) {
-                c = base.darker();
+            int w = getWidth();
+            int h = getHeight();
+            int arc = Math.min(h, 22);
+            Color c = isEnabled() ? base : NEUTRAL;
+            float bright = 0f;
+            if (isEnabled() && getModel().isPressed()) {
+                bright = -0.12f;
+            } else if (isEnabled() && getModel().isRollover()) {
+                bright = 0.12f;
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g2.setColor(alpha(shade(c, 0.3f), 70));
+                g2.setStroke(new BasicStroke(3f));
+                g2.drawRoundRect(1, 1, w - 3, h - 3, arc, arc);
+                g2.dispose();
             }
-            g2.setColor(c);
-            g2.fillRoundRect(0, 0, getWidth(), getHeight(), 12, 12);
-            g2.dispose();
+            paintLiquid(g, 2, 2, w - 4, h - 4, arc - 2, c, bright);
+            setForeground(isEnabled() ? Color.WHITE : MUTED);
             super.paintComponent(g);
         }
     }
@@ -219,14 +416,195 @@ public final class UIStyle {
     // ==================== INPUTS ====================
 
     /**
-     * Border used by text inputs: thin grey line plus inner padding.
+     * Rounded outline border for inputs; glows blue while the component has focus.
+     *
+     * @author Usman
+     */
+    public static class RoundedFieldBorder extends AbstractBorder {
+
+        /** Serialization version. */
+        private static final long serialVersionUID = 1L;
+        /** Inner padding. */
+        private final Insets pad;
+
+        /**
+         * Creates the border.
+         *
+         * @param top    top padding
+         * @param left   left padding
+         * @param bottom bottom padding
+         * @param right  right padding
+         */
+        public RoundedFieldBorder(int top, int left, int bottom, int right) {
+            this.pad = new Insets(top, left, bottom, right);
+        }
+
+        /**
+         * Paints the rounded outline.
+         *
+         * @param c      the component
+         * @param g      graphics
+         * @param x      left
+         * @param y      top
+         * @param width  width
+         * @param height height
+         */
+        @Override
+        public void paintBorder(Component c, Graphics g, int x, int y, int width, int height) {
+            Graphics2D g2 = (Graphics2D) g.create();
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            boolean focus = c.hasFocus() || (c instanceof JComboBox && ((JComboBox<?>) c).isPopupVisible());
+            if (focus) {
+                g2.setColor(alpha(ACCENT_BRIGHT, 60));
+                g2.setStroke(new BasicStroke(3f));
+                g2.drawRoundRect(x + 1, y + 1, width - 3, height - 3, 14, 14);
+            }
+            g2.setStroke(new BasicStroke(1f));
+            g2.setColor(focus ? ACCENT_BRIGHT : new Color(0x22406B));
+            g2.drawRoundRect(x + 1, y + 1, width - 3, height - 3, 12, 12);
+            g2.dispose();
+        }
+
+        /**
+         * Returns the padding.
+         *
+         * @param c the component
+         * @return the insets
+         */
+        @Override
+        public Insets getBorderInsets(Component c) {
+            return new Insets(pad.top, pad.left, pad.bottom, pad.right);
+        }
+
+        /**
+         * Fills the given insets object with the padding.
+         *
+         * @param c      the component
+         * @param insets the insets to fill
+         * @return the insets
+         */
+        @Override
+        public Insets getBorderInsets(Component c, Insets insets) {
+            insets.set(pad.top, pad.left, pad.bottom, pad.right);
+            return insets;
+        }
+    }
+
+    /**
+     * Fills a rounded dark input background behind a component.
+     *
+     * @param c the component
+     * @param g graphics
+     */
+    static void paintInputBackground(JComponent c, Graphics g) {
+        Graphics2D g2 = (Graphics2D) g.create();
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        boolean editable = !(c instanceof JTextField) || ((JTextField) c).isEditable();
+        g2.setPaint(new GradientPaint(0, 0, editable ? new Color(0x0E1A30) : new Color(0x0A1020),
+                0, c.getHeight(), editable ? INPUT_BG : new Color(0x080D18)));
+        g2.fillRoundRect(1, 1, c.getWidth() - 2, c.getHeight() - 2, 12, 12);
+        g2.dispose();
+    }
+
+    /**
+     * Border used by text inputs.
      *
      * @return the border
      */
     public static Border inputBorder() {
-        return BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(BORDER, 1, true),
-                BorderFactory.createEmptyBorder(6, 10, 6, 10));
+        return new RoundedFieldBorder(7, 12, 7, 12);
+    }
+
+    /**
+     * A dark rounded glass text field.
+     *
+     * @author Usman
+     */
+    public static class GlassTextField extends JTextField {
+
+        /** Serialization version. */
+        private static final long serialVersionUID = 1L;
+
+        /**
+         * Creates the field.
+         *
+         * @param columns preferred width in columns
+         */
+        public GlassTextField(int columns) {
+            super(columns);
+            styleInput(this);
+        }
+
+        /**
+         * Paints the rounded background, then the text.
+         *
+         * @param g graphics
+         */
+        @Override
+        protected void paintComponent(Graphics g) {
+            paintInputBackground(this, g);
+            super.paintComponent(g);
+        }
+    }
+
+    /**
+     * A dark rounded glass password field.
+     *
+     * @author Usman
+     */
+    public static class GlassPasswordField extends JPasswordField {
+
+        /** Serialization version. */
+        private static final long serialVersionUID = 1L;
+
+        /**
+         * Creates the field.
+         *
+         * @param columns preferred width in columns
+         */
+        public GlassPasswordField(int columns) {
+            super(columns);
+            styleInput(this);
+        }
+
+        /**
+         * Paints the rounded background, then the text.
+         *
+         * @param g graphics
+         */
+        @Override
+        protected void paintComponent(Graphics g) {
+            paintInputBackground(this, g);
+            super.paintComponent(g);
+        }
+    }
+
+    /**
+     * Applies the shared input look (transparent, light text, blue caret, rounded border,
+     * border repaint on focus change).
+     *
+     * @param f the text field
+     */
+    private static void styleInput(JTextField f) {
+        f.setOpaque(false);
+        f.setFont(BODY);
+        f.setForeground(TEXT);
+        f.setCaretColor(ACCENT_BRIGHT);
+        f.setSelectionColor(SELECTION);
+        f.setSelectedTextColor(Color.WHITE);
+        f.setDisabledTextColor(MUTED);
+        f.setBorder(inputBorder());
+        f.addFocusListener(new java.awt.event.FocusAdapter() {
+            @Override
+            public void focusGained(java.awt.event.FocusEvent e) {
+                f.repaint();
+            }
+
+            @Override
+            public void focusLost(java.awt.event.FocusEvent e) {
+                f.repaint();
+            }
+        });
     }
 
     /**
@@ -236,10 +614,7 @@ public final class UIStyle {
      * @return the field
      */
     public static JTextField createTextField(int columns) {
-        JTextField f = new JTextField(columns);
-        f.setFont(BODY);
-        f.setBorder(inputBorder());
-        return f;
+        return new GlassTextField(columns);
     }
 
     /**
@@ -249,14 +624,208 @@ public final class UIStyle {
      * @return the field
      */
     public static JPasswordField createPasswordField(int columns) {
-        JPasswordField f = new JPasswordField(columns);
-        f.setFont(BODY);
-        f.setBorder(inputBorder());
-        return f;
+        return new GlassPasswordField(columns);
     }
 
     /**
-     * Creates a styled combo box.
+     * Small chevron button used by combo boxes and spinners.
+     *
+     * @author Usman
+     */
+    public static class ArrowButton extends JButton {
+
+        /** Serialization version. */
+        private static final long serialVersionUID = 1L;
+        /** Direction: SwingConstants.NORTH or SOUTH. */
+        private final int direction;
+
+        /**
+         * Creates the arrow button.
+         *
+         * @param direction SwingConstants.NORTH or SwingConstants.SOUTH
+         */
+        public ArrowButton(int direction) {
+            this.direction = direction;
+            setOpaque(false);
+            setContentAreaFilled(false);
+            setBorderPainted(false);
+            setFocusPainted(false);
+            setFocusable(false);
+            setRolloverEnabled(true);
+            setBorder(BorderFactory.createEmptyBorder());
+            setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+            setPreferredSize(new Dimension(28, 14));
+        }
+
+        /**
+         * Paints the chevron.
+         *
+         * @param g graphics
+         */
+        @Override
+        protected void paintComponent(Graphics g) {
+            Graphics2D g2 = (Graphics2D) g.create();
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            g2.setColor(getModel().isRollover() ? Color.WHITE : ACCENT_BRIGHT);
+            g2.setStroke(new BasicStroke(1.8f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+            int cx = getWidth() / 2;
+            int cy = getHeight() / 2;
+            int s = 4;
+            if (direction == SwingConstants.NORTH) {
+                g2.drawPolyline(new int[]{cx - s, cx, cx + s}, new int[]{cy + s / 2, cy - s / 2, cy + s / 2}, 3);
+            } else {
+                g2.drawPolyline(new int[]{cx - s, cx, cx + s}, new int[]{cy - s / 2, cy + s / 2, cy - s / 2}, 3);
+            }
+            g2.dispose();
+        }
+    }
+
+    /**
+     * Combo box UI with a dark rounded body, blue chevron and dark popup list.
+     *
+     * @author Usman
+     */
+    public static class GlassComboBoxUI extends BasicComboBoxUI {
+
+        /**
+         * Creates the UI.
+         */
+        public GlassComboBoxUI() {
+            super();
+        }
+
+        /**
+         * Installs the UI and makes the combo transparent so the rounded body shows.
+         *
+         * @param c the combo box
+         */
+        @Override
+        public void installUI(JComponent c) {
+            super.installUI(c);
+            c.setOpaque(false);
+            c.setBorder(new RoundedFieldBorder(1, 4, 1, 2));
+        }
+
+        /**
+         * Creates the chevron arrow button.
+         *
+         * @return the arrow button
+         */
+        @Override
+        protected JButton createArrowButton() {
+            return new ArrowButton(SwingConstants.SOUTH);
+        }
+
+        /**
+         * Creates the popup with a dark border.
+         *
+         * @return the popup
+         */
+        @Override
+        protected ComboPopup createPopup() {
+            BasicComboPopup p = new BasicComboPopup(comboBox);
+            p.setBorder(BorderFactory.createLineBorder(new Color(0x22406B)));
+            return p;
+        }
+
+        /**
+         * Paints the rounded body and the current value text.
+         *
+         * @param g graphics
+         * @param c the combo box
+         */
+        @Override
+        public void paint(Graphics g, JComponent c) {
+            paintInputBackground(c, g);
+            Rectangle r = rectangleForCurrentValue();
+            Object value = comboBox.getSelectedItem();
+            if (value != null) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+                g2.setFont(comboBox.getFont());
+                g2.setColor(comboBox.isEnabled() ? TEXT : MUTED);
+                FontMetrics fm = g2.getFontMetrics();
+                String text = ellipsize(value.toString(), fm, r.width - 10);
+                g2.drawString(text, r.x + 8, r.y + (r.height - fm.getHeight()) / 2 + fm.getAscent());
+                g2.dispose();
+            }
+        }
+    }
+
+    /**
+     * Spinner UI with chevron buttons and a dark rounded body.
+     *
+     * @author Usman
+     */
+    public static class GlassSpinnerUI extends BasicSpinnerUI {
+
+        /**
+         * Creates the UI.
+         */
+        public GlassSpinnerUI() {
+            super();
+        }
+
+        /**
+         * Creates the "increase" button.
+         *
+         * @return the button
+         */
+        @Override
+        protected Component createNextButton() {
+            JButton b = new ArrowButton(SwingConstants.NORTH);
+            installNextButtonListeners(b);
+            return b;
+        }
+
+        /**
+         * Creates the "decrease" button.
+         *
+         * @return the button
+         */
+        @Override
+        protected Component createPreviousButton() {
+            JButton b = new ArrowButton(SwingConstants.SOUTH);
+            installPreviousButtonListeners(b);
+            return b;
+        }
+
+        /**
+         * Paints the rounded body before the children.
+         *
+         * @param g graphics
+         * @param c the spinner
+         */
+        @Override
+        public void update(Graphics g, JComponent c) {
+            paintInputBackground(c, g);
+            paint(g, c);
+        }
+    }
+
+    /**
+     * Applies the glass look to a spinner.
+     *
+     * @param s the spinner
+     */
+    public static void styleSpinner(JSpinner s) {
+        s.setUI(new GlassSpinnerUI());
+        s.setOpaque(false);
+        s.setFont(BODY);
+        s.setBorder(new RoundedFieldBorder(2, 6, 2, 4));
+        if (s.getEditor() instanceof JSpinner.DefaultEditor) {
+            JTextField tf = ((JSpinner.DefaultEditor) s.getEditor()).getTextField();
+            tf.setOpaque(false);
+            tf.setForeground(TEXT);
+            tf.setCaretColor(ACCENT_BRIGHT);
+            tf.setFont(BODY);
+            tf.setBorder(BorderFactory.createEmptyBorder());
+            s.getEditor().setOpaque(false);
+        }
+    }
+
+    /**
+     * Creates a styled glass combo box.
      *
      * @param items the items
      * @param <T>   item type
@@ -264,14 +833,156 @@ public final class UIStyle {
      */
     public static <T> JComboBox<T> createComboBox(T[] items) {
         JComboBox<T> c = new JComboBox<>(items);
+        c.setUI(new GlassComboBoxUI());
         c.setFont(BODY);
-        c.setBackground(Color.WHITE);
+        c.setBackground(INPUT_BG);
+        c.setForeground(TEXT);
         c.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        c.setRenderer(new GlassListRenderer<>());
+        c.setMaximumRowCount(12);
         return c;
     }
 
     /**
-     * Creates a form label (small, bold, muted).
+     * Dark list renderer for combo box popups.
+     *
+     * @param <T> item type
+     * @author Usman
+     */
+    public static class GlassListRenderer<T> extends JLabel implements ListCellRenderer<T> {
+
+        /** Serialization version. */
+        private static final long serialVersionUID = 1L;
+
+        /**
+         * Creates the renderer.
+         */
+        public GlassListRenderer() {
+            setOpaque(true);
+            setBorder(BorderFactory.createEmptyBorder(6, 10, 6, 10));
+        }
+
+        /**
+         * Configures the renderer for one list item.
+         *
+         * @param list         the list
+         * @param value        the value
+         * @param index        the index
+         * @param isSelected   whether selected
+         * @param cellHasFocus whether focused
+         * @return this renderer
+         */
+        @Override
+        public Component getListCellRendererComponent(JList<? extends T> list, T value, int index,
+                                                      boolean isSelected, boolean cellHasFocus) {
+            setText(value == null ? "" : value.toString());
+            setFont(BODY);
+            setBackground(isSelected ? SELECTION : INPUT_BG);
+            setForeground(isSelected ? Color.WHITE : TEXT);
+            return this;
+        }
+    }
+
+    /**
+     * Thin translucent scroll bar with a rounded blue glass thumb and no arrow buttons.
+     *
+     * @author Usman
+     */
+    public static class GlassScrollBarUI extends BasicScrollBarUI {
+
+        /**
+         * Creates the UI.
+         */
+        public GlassScrollBarUI() {
+            super();
+        }
+
+        /**
+         * Factory used by UIManager ("ScrollBarUI").
+         *
+         * @param c the scroll bar
+         * @return a new UI instance
+         */
+        public static ComponentUI createUI(JComponent c) {
+            return new GlassScrollBarUI();
+        }
+
+        /**
+         * Returns an invisible zero-size button (no arrows).
+         *
+         * @return the button
+         */
+        private JButton zero() {
+            JButton b = new JButton();
+            b.setPreferredSize(new Dimension(0, 0));
+            b.setMinimumSize(new Dimension(0, 0));
+            b.setMaximumSize(new Dimension(0, 0));
+            return b;
+        }
+
+        /**
+         * Creates the (hidden) decrease button.
+         *
+         * @param orientation orientation
+         * @return the button
+         */
+        @Override
+        protected JButton createDecreaseButton(int orientation) {
+            return zero();
+        }
+
+        /**
+         * Creates the (hidden) increase button.
+         *
+         * @param orientation orientation
+         * @return the button
+         */
+        @Override
+        protected JButton createIncreaseButton(int orientation) {
+            return zero();
+        }
+
+        /**
+         * Paints the track.
+         *
+         * @param g      graphics
+         * @param c      component
+         * @param bounds track bounds
+         */
+        @Override
+        protected void paintTrack(Graphics g, JComponent c, Rectangle bounds) {
+            g.setColor(new Color(0x09101D));
+            g.fillRect(bounds.x, bounds.y, bounds.width, bounds.height);
+        }
+
+        /**
+         * Paints the rounded glass thumb.
+         *
+         * @param g      graphics
+         * @param c      component
+         * @param bounds thumb bounds
+         */
+        @Override
+        protected void paintThumb(Graphics g, JComponent c, Rectangle bounds) {
+            if (bounds.isEmpty()) return;
+            Graphics2D g2 = (Graphics2D) g.create();
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            boolean vertical = scrollbar.getOrientation() == JScrollBar.VERTICAL;
+            int pad = 3;
+            int x = bounds.x + (vertical ? pad : 1);
+            int y = bounds.y + (vertical ? 1 : pad);
+            int w = bounds.width - (vertical ? pad * 2 : 2);
+            int h = bounds.height - (vertical ? 2 : pad * 2);
+            g2.setColor(alpha(ACCENT_BRIGHT, isThumbRollover() ? 170 : 110));
+            g2.fillRoundRect(x, y, w, h, 8, 8);
+            g2.dispose();
+        }
+    }
+
+    // ==================== LABELS ====================
+
+    /**
+     * Creates a form label (small, bold, muted blue-grey).
      *
      * @param text the text
      * @return the label
@@ -320,7 +1031,7 @@ public final class UIStyle {
     }
 
     /**
-     * Creates a small rounded coloured badge (e.g. the role badge in the header).
+     * Creates a small liquid-glass badge (e.g. the role badge in the header).
      *
      * @param text  badge text
      * @param color badge colour
@@ -332,18 +1043,14 @@ public final class UIStyle {
 
             @Override
             protected void paintComponent(Graphics g) {
-                Graphics2D g2 = (Graphics2D) g.create();
-                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                g2.setColor(color);
-                g2.fillRoundRect(0, 0, getWidth(), getHeight(), getHeight(), getHeight());
-                g2.dispose();
+                paintLiquid(g, 0, 0, getWidth(), getHeight(), getHeight(), color, 0f);
                 super.paintComponent(g);
             }
         };
         l.setFont(SMALL_BOLD);
         l.setForeground(Color.WHITE);
         l.setHorizontalAlignment(SwingConstants.CENTER);
-        l.setBorder(BorderFactory.createEmptyBorder(3, 12, 3, 12));
+        l.setBorder(BorderFactory.createEmptyBorder(4, 14, 4, 14));
         return l;
     }
 
@@ -353,7 +1060,7 @@ public final class UIStyle {
      *
      * @author Usman
      */
-    public static class EmojiIcon implements javax.swing.Icon {
+    public static class EmojiIcon implements Icon {
 
         /** The symbol text to draw. */
         private final String symbol;
@@ -416,6 +1123,71 @@ public final class UIStyle {
     }
 
     /**
+     * A small glossy liquid-glass dot, used as a bullet.
+     *
+     * @author Usman
+     */
+    public static class LiquidDotIcon implements Icon {
+
+        /** Dot diameter. */
+        private final int size;
+        /** Dot colour. */
+        private final Color color;
+
+        /**
+         * Creates the dot icon.
+         *
+         * @param size  diameter in pixels
+         * @param color colour
+         */
+        public LiquidDotIcon(int size, Color color) {
+            this.size = size;
+            this.color = color;
+        }
+
+        /**
+         * Paints the dot with a soft glow and a highlight.
+         *
+         * @param c the component
+         * @param g graphics
+         * @param x left
+         * @param y top
+         */
+        @Override
+        public void paintIcon(Component c, Graphics g, int x, int y) {
+            Graphics2D g2 = (Graphics2D) g.create();
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            g2.setColor(alpha(color, 60));
+            g2.fillOval(x, y, size + 4, size + 4);
+            g2.setPaint(new GradientPaint(x, y, shade(color, 0.35f), x, y + size, shade(color, -0.35f)));
+            g2.fillOval(x + 2, y + 2, size, size);
+            g2.setColor(new Color(255, 255, 255, 170));
+            g2.fillOval(x + 2 + size / 4, y + 3, size / 2, size / 3);
+            g2.dispose();
+        }
+
+        /**
+         * Returns the icon width.
+         *
+         * @return width
+         */
+        @Override
+        public int getIconWidth() {
+            return size + 4;
+        }
+
+        /**
+         * Returns the icon height.
+         *
+         * @return height
+         */
+        @Override
+        public int getIconHeight() {
+            return size + 4;
+        }
+    }
+
+    /**
      * Creates a label made of an emoji icon followed by text.
      *
      * @param symbol emoji/symbol
@@ -434,7 +1206,8 @@ public final class UIStyle {
     // ==================== CARDS ====================
 
     /**
-     * A white panel with rounded corners and a subtle border.
+     * A frosted liquid-glass card with rounded corners, a gradient rim and a top sheen.
+     * It is transparent, so the glowing background shows through.
      *
      * @author Usman
      */
@@ -444,23 +1217,23 @@ public final class UIStyle {
         private static final long serialVersionUID = 1L;
         /** Corner radius. */
         private final int radius;
-        /** Fill colour. */
+        /** Glass tint colour. */
         private final Color fill;
 
         /**
-         * Creates a rounded white card with the given layout.
+         * Creates a glass card with the given layout.
          *
          * @param layout the layout manager
          */
         public RoundedPanel(LayoutManager layout) {
-            this(layout, CARD, 16);
+            this(layout, new Color(12, 20, 38, 150), 22);
         }
 
         /**
-         * Creates a rounded card.
+         * Creates a glass card.
          *
          * @param layout the layout manager
-         * @param fill   fill colour
+         * @param fill   glass tint colour (alpha respected)
          * @param radius corner radius
          */
         public RoundedPanel(LayoutManager layout, Color fill, int radius) {
@@ -472,22 +1245,42 @@ public final class UIStyle {
         }
 
         /**
-         * Paints the rounded background and border.
+         * Paints the glass surface.
          *
          * @param g the graphics context
          */
         @Override
         protected void paintComponent(Graphics g) {
-            Graphics2D g2 = (Graphics2D) g.create();
-            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-            g2.setColor(fill);
-            g2.fillRoundRect(0, 0, getWidth() - 1, getHeight() - 1, radius, radius);
-            g2.setColor(BORDER);
-            g2.setStroke(new BasicStroke(1f));
-            g2.drawRoundRect(0, 0, getWidth() - 1, getHeight() - 1, radius, radius);
-            g2.dispose();
+            paintGlass(g, getWidth(), getHeight(), radius, fill);
             super.paintComponent(g);
         }
+    }
+
+    /**
+     * Creates a translucent black bar (header / status / welcome bars).
+     *
+     * @param topLine    draw a hairline at the top
+     * @param bottomLine draw a hairline at the bottom
+     * @return the bar panel (BorderLayout)
+     */
+    public static JPanel glassBar(boolean topLine, boolean bottomLine) {
+        JPanel bar = new JPanel(new java.awt.BorderLayout()) {
+            private static final long serialVersionUID = 1L;
+
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setPaint(new GradientPaint(0, 0, new Color(6, 10, 20, 205), 0, getHeight(), new Color(8, 14, 28, 175)));
+                g2.fillRect(0, 0, getWidth(), getHeight());
+                g2.setPaint(new GradientPaint(0, 0, new Color(96, 165, 250, 0), getWidth() / 2f, 0,
+                        new Color(96, 165, 250, 90), true));
+                if (topLine) g2.fillRect(0, 0, getWidth(), 1);
+                if (bottomLine) g2.fillRect(0, getHeight() - 1, getWidth(), 1);
+                g2.dispose();
+            }
+        };
+        bar.setOpaque(false);
+        return bar;
     }
 
     /**
@@ -501,7 +1294,7 @@ public final class UIStyle {
         JPanel p = new JPanel();
         p.setOpaque(false);
         p.setLayout(new javax.swing.BoxLayout(p, javax.swing.BoxLayout.Y_AXIS));
-        JLabel t = label(title, TITLE, TEXT);
+        JLabel t = label(title, TITLE, Color.WHITE);
         JLabel s = label(subtitle, SMALL, MUTED);
         p.add(t);
         p.add(javax.swing.Box.createVerticalStrut(2));
@@ -530,7 +1323,7 @@ public final class UIStyle {
     }
 
     /**
-     * Styles a table: row height 28, alternating rows, bold header, selection colour,
+     * Styles a table: row height 28, alternating dark rows, bold blue header, blue selection,
      * auto-resize and sorting via {@link TableRowSorter}.
      *
      * @param table the table to style
@@ -548,13 +1341,15 @@ public final class UIStyle {
     public static void styleTable(JTable table, IntPredicate highlight) {
         table.setRowHeight(28);
         table.setFont(BODY);
+        table.setBackground(ROW);
+        table.setForeground(TEXT);
         table.setShowVerticalLines(false);
         table.setShowHorizontalLines(true);
-        table.setGridColor(BORDER);
+        table.setGridColor(GRID);
         table.setIntercellSpacing(new Dimension(0, 1));
         table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         table.setSelectionBackground(SELECTION);
-        table.setSelectionForeground(TEXT);
+        table.setSelectionForeground(Color.WHITE);
         table.setFillsViewportHeight(true);
         table.setAutoResizeMode(JTable.AUTO_RESIZE_SUBSEQUENT_COLUMNS);
         table.setAutoCreateRowSorter(false);
@@ -569,25 +1364,30 @@ public final class UIStyle {
 
         JTableHeader header = table.getTableHeader();
         header.setReorderingAllowed(false);
+        header.setBackground(HEADER_BG);
         header.setPreferredSize(new Dimension(header.getPreferredSize().width, 34));
         header.setDefaultRenderer(new HeaderRenderer());
     }
 
     /**
-     * Wraps a table in a borderless scroll pane with a white viewport.
+     * Wraps a table in a dark scroll pane with a hairline border.
      *
      * @param table the table
      * @return the scroll pane
      */
     public static JScrollPane scroll(JTable table) {
         JScrollPane sp = new JScrollPane(table);
-        sp.setBorder(BorderFactory.createLineBorder(BORDER));
-        sp.getViewport().setBackground(Color.WHITE);
+        sp.setBorder(BorderFactory.createLineBorder(new Color(0x1A2B47)));
+        sp.getViewport().setBackground(ROW);
+        sp.setBackground(ROW);
+        JPanel corner = new JPanel();
+        corner.setBackground(HEADER_BG);
+        sp.setCorner(JScrollPane.UPPER_RIGHT_CORNER, corner);
         return sp;
     }
 
     /**
-     * Cell renderer with alternating row colours, padding and optional red highlighting.
+     * Cell renderer with alternating dark rows, padding and optional red highlighting.
      *
      * @author Usman
      */
@@ -628,12 +1428,12 @@ public final class UIStyle {
             boolean hot = highlight != null && highlight.test(modelRow);
             if (isSelected) {
                 setBackground(SELECTION);
-                setForeground(hot ? OVERDUE_TEXT : TEXT);
+                setForeground(hot ? OVERDUE_TEXT : Color.WHITE);
             } else if (hot) {
                 setBackground(OVERDUE_ROW);
                 setForeground(OVERDUE_TEXT);
             } else {
-                setBackground(row % 2 == 0 ? Color.WHITE : ROW_ALT);
+                setBackground(row % 2 == 0 ? ROW : ROW_ALT);
                 setForeground(TEXT);
             }
             setHorizontalAlignment(value instanceof Number ? SwingConstants.CENTER : SwingConstants.LEFT);
@@ -642,7 +1442,8 @@ public final class UIStyle {
     }
 
     /**
-     * Bold table header renderer with a light background and bottom accent line.
+     * Bold table header renderer: dark blue background, light blue text and a glowing
+     * accent line at the bottom.
      *
      * @author Usman
      */
@@ -674,8 +1475,8 @@ public final class UIStyle {
                                                        boolean hasFocus, int row, int column) {
             super.getTableCellRendererComponent(table, value, false, false, row, column);
             setFont(SMALL_BOLD);
-            setForeground(NAVY);
-            setBackground(new Color(0xEEF2F7));
+            setForeground(new Color(0x93C5FD));
+            setBackground(HEADER_BG);
             setOpaque(true);
             setHorizontalAlignment(SwingConstants.LEFT);
             setBorder(BorderFactory.createCompoundBorder(

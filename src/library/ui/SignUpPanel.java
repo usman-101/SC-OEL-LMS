@@ -61,7 +61,7 @@ public class SignUpPanel extends JPanel {
         setOpaque(false);
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
-        LoginFrame.addLeft(this, UIStyle.label("Create account", UIStyle.TITLE, UIStyle.TEXT));
+        LoginFrame.addLeft(this, UIStyle.label("Create account", UIStyle.TITLE, java.awt.Color.WHITE));
         LoginFrame.addLeft(this, UIStyle.label("Join the library in a few seconds", UIStyle.SMALL, UIStyle.MUTED));
         add(Box.createVerticalStrut(16));
 
@@ -78,7 +78,7 @@ public class SignUpPanel extends JPanel {
         submitButton.addActionListener(e -> doSignUp());
         LoginFrame.addLeft(this, LoginFrame.fullWidth(submitButton));
         add(Box.createVerticalStrut(12));
-        LoginFrame.addLeft(this, UIStyle.linkLabel("Already have an account? <b><font color='#3B82F6'>Sign In</font></b>",
+        LoginFrame.addLeft(this, UIStyle.linkLabel("Already have an account? <b><font color='#60A5FA'>Sign In</font></b>",
                 () -> owner.showSignIn(null)));
 
         emailField.getDocument().addDocumentListener(new DocumentListener() {
@@ -145,10 +145,10 @@ public class SignUpPanel extends JPanel {
             roleHint.setText(" ");
         } else if (admin) {
             roleHint.setText("Account type: Admin / Librarian (access code required)");
-            roleHint.setForeground(UIStyle.ACCENT_DARK);
+            roleHint.setForeground(UIStyle.ACCENT_BRIGHT);
         } else {
             roleHint.setText("Account type: Student");
-            roleHint.setForeground(UIStyle.SUCCESS);
+            roleHint.setForeground(UIStyle.CYAN);
         }
     }
 

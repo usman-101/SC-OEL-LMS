@@ -137,7 +137,6 @@ public class MembersPanel extends JPanel implements Refreshable {
         card.add(head, c);
 
         idField.setEditable(false);
-        idField.setBackground(UIStyle.BACKGROUND);
         idField.setToolTipText("Generated automatically");
         BooksPanel.addField(card, c, "Member ID (auto)", idField);
         BooksPanel.addField(card, c, "Full Name", nameField);

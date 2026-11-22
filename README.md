@@ -116,12 +116,21 @@ Open `docs/javadoc/index.html` in a browser.
 - **My History:** the student's own transactions.
 - Top bar: "Welcome, name" with counts of issued, reserved and overdue books.
 
-### UI
-Flat design: navy sidebar `#1F2A44`, accent blue `#3B82F6`, light grey background `#F4F6FA`,
-white rounded cards, Segoe UI / SansSerif fonts. Styled tables (row height 28, alternating rows,
-bold header, sorting). Buttons with hover effects and a hand cursor. The window is at least
-1100x700 and resizable (the main window opens maximized). All errors and confirmations use
-`JOptionPane`, and a status bar at the bottom shows feedback.
+### UI: "liquid glass" theme (black and blue)
+- **Background:** near-black (`#04060C`) lit by soft blue and cyan glows (`GlassBackground`).
+- **Panels:** frosted, translucent glass cards with rounded corners, a light gradient rim and
+  a top sheen, so the blue glow shows through them.
+- **Buttons and highlights:** glossy liquid pills in royal blue `#2563EB`, sky `#0EA5E9` and
+  indigo `#6366F1`. Red `#EF4444` is used only for Delete and overdue items. Buttons get a soft
+  glow on hover. The selected sidebar item is a blue liquid pill.
+- **Inputs:** dark rounded text fields, combo boxes and spinners with a blue focus ring and blue
+  chevrons. Scroll bars are thin glass thumbs.
+- **Tables:** dark alternating rows, a navy header with light-blue bold text and a glowing
+  accent line, blue selection, sorting, row height 28.
+- **Dialogs:** dark `JOptionPane` dialogs with blue buttons. The app uses the cross-platform
+  (Metal) look and feel, styled by `UIStyle.installTheme()`, so it looks the same on every OS.
+- **Window:** at least 1100x700 and resizable (the main window opens maximized). A status bar
+  at the bottom shows feedback. Fonts are Segoe UI, falling back to SansSerif.
 
 ---
 
@@ -141,7 +150,7 @@ SC-OEL/
 |                                 DashboardPanel, BooksPanel, IssueReturnPanel, MembersPanel,
 |                                 OverduePanel, TransactionsPanel, BrowseBooksPanel, MyBooksPanel,
 |                                 MyHistoryPanel, NavigationPanel, SidebarPanel, SearchFilterBar,
-|                                 TableCard, StatCard, UIStyle, Refreshable
+|                                 TableCard, StatCard, GlassBackground, UIStyle, Refreshable
 |-- test/library/LibraryServiceTest.java   plain-Java tests (PASS/FAIL + summary)
 |-- docs/
 |   |-- javadoc/                  generated HTML documentation

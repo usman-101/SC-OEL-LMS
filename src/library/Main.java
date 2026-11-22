@@ -7,7 +7,6 @@ import library.ui.UIStyle;
 
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
 import java.nio.file.Paths;
 
 /**
@@ -41,12 +40,7 @@ public final class Main {
      * Initialises the look and feel, data and login window. Runs on the event dispatch thread.
      */
     private static void start() {
-        try {
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        } catch (Exception e) {
-            // fall back to the default cross-platform look and feel
-        }
-        UIStyle.applyGlobalDefaults();
+        UIStyle.installTheme();
 
         Thread.setDefaultUncaughtExceptionHandler((thread, ex) -> SwingUtilities.invokeLater(() ->
                 JOptionPane.showMessageDialog(null, "An unexpected error occurred:\n" + ex,
