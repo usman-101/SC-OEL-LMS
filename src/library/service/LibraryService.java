@@ -129,25 +129,24 @@ public class LibraryService {
      * @param title    the new title
      * @param author   the new author
      * @param category the new category
+     * @return the updated book
      * @throws LibraryException if the book is not found or new values are invalid
      */
-    public void updateBook(String id, String title, String author, Category category) throws LibraryException {
-        if (id == null || id.trim().isEmpty()) {
-            throw new LibraryException("Book ID cannot be empty.");
-        }
+    public Book updateBook(String id, String title, String author, Category category) throws LibraryException {
+        Book book = requireBook(id);
         if (title == null || title.trim().isEmpty()) {
             throw new LibraryException("Book title cannot be empty.");
         }
         if (author == null || author.trim().isEmpty()) {
             throw new LibraryException("Book author cannot be empty.");
         }
-        Book book = findById(id);
-        if (book == null) {
-            throw new LibraryException("Book with ID '" + id.trim() + "' not found.");
+        if (category == null) {
+            throw new LibraryException("Book category cannot be empty.");
         }
         book.setTitle(title.trim());
         book.setAuthor(author.trim());
         book.setCategory(category);
+        return book;
     }
 
     /**
@@ -155,30 +154,58 @@ public class LibraryService {
      * Cannot delete a book that is currently issued.
      *
      * @param id the ID of the book to delete
-     * @throws LibraryException if the book is not found or is currently issued
+     * @return the deleted book
+     * @throws LibraryException if the ID is empty, the book is not found or it is currently issued
      */
-    public void deleteBook(String id) throws LibraryException {
-        if (id == null || id.trim().isEmpty()) {
-            throw new LibraryException("Book ID cannot be empty.");
-        }
-        Book book = findById(id);
-        if (book == null) {
-            throw new LibraryException("Book with ID '" + id.trim() + "' not found.");
-        }
-        if (book.getStatus() == BookStatus.ISSUED) {
-            throw new LibraryException("Cannot delete book '" + book.getTitle() + "' because it is currently issued.");
+    public Book deleteBook(String id) throws LibraryException {
+        Book book = requireBook(id);
+        if (book.getStatus() == BookStatus.ISSUED || hasActiveLoan(book.getId())) {
+            throw new LibraryException("Cannot delete book '" + book.getTitle()
+                    + "' because it is currently issued. Return it first.");
         }
         books.remove(book);
+        return book;
     }
 
     /**
-     * Sets the status of a book.
+     * Manually sets the status of a book (librarian action).
+     * Rules: the new status must differ from the current one, and a book with an
+     * active loan cannot be changed manually (it must be returned first).
+     * Switching to AVAILABLE clears issue/reservation details.
      *
      * @param id     the book ID
      * @param status the new status
-     * @throws LibraryException if the book is not found
+     * @return the updated book
+     * @throws LibraryException if the ID is empty, the book is not found, the status is null,
+     *                          unchanged, or the book has an active loan
      */
-    public void setStatus(String id, BookStatus status) throws LibraryException {
+    public Book setStatus(String id, BookStatus status) throws LibraryException {
+        Book book = requireBook(id);
+        if (status == null) {
+            throw new LibraryException("Please choose a status.");
+        }
+        if (book.getStatus() == status) {
+            throw new LibraryException("Book '" + book.getTitle() + "' is already " + status.getDisplayName() + ".");
+        }
+        if (hasActiveLoan(book.getId())) {
+            throw new LibraryException("Book '" + book.getTitle()
+                    + "' has an active loan. Use Return on the Issue/Return screen instead.");
+        }
+        book.setStatus(status);
+        book.setIssuedTo("");
+        book.setDueDate("");
+        book.setReservedBy("");
+        return book;
+    }
+
+    /**
+     * Finds a book by ID or throws a descriptive exception.
+     *
+     * @param id the book ID
+     * @return the matching book (never null)
+     * @throws LibraryException if the ID is empty or no such book exists
+     */
+    public Book requireBook(String id) throws LibraryException {
         if (id == null || id.trim().isEmpty()) {
             throw new LibraryException("Book ID cannot be empty.");
         }
@@ -186,7 +213,33 @@ public class LibraryService {
         if (book == null) {
             throw new LibraryException("Book with ID '" + id.trim() + "' not found.");
         }
-        book.setStatus(status);
+        return book;
+    }
+
+    /**
+     * Checks whether a book currently has an active (not returned) loan.
+     *
+     * @param bookId the book ID
+     * @return true if an active loan exists for the book
+     */
+    public boolean hasActiveLoan(String bookId) {
+        return findActiveLoanForBook(bookId) != null;
+    }
+
+    /**
+     * Finds the active loan for a book, if any.
+     *
+     * @param bookId the book ID
+     * @return the active loan, or null if the book is not on loan
+     */
+    public Loan findActiveLoanForBook(String bookId) {
+        if (bookId == null) return null;
+        for (Loan loan : loans) {
+            if (loan.isActive() && loan.getBookId().equalsIgnoreCase(bookId.trim())) {
+                return loan;
+            }
+        }
+        return null;
     }
 
     // ==================== SEARCH / FILTER ====================
