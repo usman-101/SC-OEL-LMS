@@ -44,6 +44,52 @@ public class LibraryService {
         this.memberService = memberService;
     }
 
+    /** Transaction log that records every change (may be null). */
+    private TransactionService transactionService;
+    /** Email of the logged-in user, written to the "Performed By" column. */
+    private String actor = "system";
+
+    /**
+     * Connects the transaction service so every operation is logged.
+     *
+     * @param transactionService the transaction service
+     */
+    public void setTransactionService(TransactionService transactionService) {
+        this.transactionService = transactionService;
+    }
+
+    /**
+     * Sets the email of the user performing subsequent operations.
+     *
+     * @param actorEmail the logged-in user's email
+     */
+    public void setActor(String actorEmail) {
+        this.actor = (actorEmail == null || actorEmail.trim().isEmpty()) ? "system" : actorEmail.trim();
+    }
+
+    /**
+     * Returns the email of the user currently performing operations.
+     *
+     * @return the actor email
+     */
+    public String getActor() {
+        return actor;
+    }
+
+    /**
+     * Writes a transaction to the log if a transaction service is connected.
+     *
+     * @param type     transaction type
+     * @param bookId   book ID
+     * @param memberId member ID
+     * @param details  details text
+     */
+    private void log(TransactionType type, String bookId, String memberId, String details) {
+        if (transactionService != null) {
+            transactionService.record(type, bookId, memberId, actor, details);
+        }
+    }
+
     /**
      * Constructs a new LibraryService with empty book and loan lists.
      */
@@ -104,6 +150,8 @@ public class LibraryService {
             throw new LibraryException("A book with ID '" + book.getId() + "' already exists.");
         }
         books.add(book);
+        log(TransactionType.ADD, book.getId(), "", "Added '" + book.getTitle() + "' by " + book.getAuthor()
+                + " (" + book.getCategory().getDisplayName() + ")");
     }
 
     /**
@@ -167,6 +215,8 @@ public class LibraryService {
         book.setTitle(title.trim());
         book.setAuthor(author.trim());
         book.setCategory(category);
+        log(TransactionType.UPDATE, book.getId(), "", "Updated to '" + book.getTitle() + "' by "
+                + book.getAuthor() + " (" + category.getDisplayName() + ")");
         return book;
     }
 
@@ -185,6 +235,7 @@ public class LibraryService {
                     + "' because it is currently issued. Return it first.");
         }
         books.remove(book);
+        log(TransactionType.DELETE, book.getId(), "", "Deleted '" + book.getTitle() + "'");
         return book;
     }
 
@@ -212,10 +263,13 @@ public class LibraryService {
             throw new LibraryException("Book '" + book.getTitle()
                     + "' has an active loan. Use Return on the Issue/Return screen instead.");
         }
+        BookStatus old = book.getStatus();
         book.setStatus(status);
         book.setIssuedTo("");
         book.setDueDate("");
         book.setReservedBy("");
+        log(TransactionType.STATUS_CHANGE, book.getId(), "",
+                "Status changed from " + old.getDisplayName() + " to " + status.getDisplayName());
         return book;
     }
 
@@ -397,6 +451,8 @@ public class LibraryService {
         book.setReservedBy("");
 
         loans.add(loan);
+        log(TransactionType.ISSUE, book.getId(), mid, "Issued '" + book.getTitle() + "' for " + loanDays
+                + " days, due " + loan.getDueDate());
         return loan;
     }
 
@@ -423,6 +479,7 @@ public class LibraryService {
         loan.setReturnDate(LocalDate.now().format(DATE_FMT));
         loan.setActive(false);
 
+        long late = getDaysOverdue(loan);
         Book book = findById(loan.getBookId());
         if (book != null) {
             book.setStatus(BookStatus.AVAILABLE);
@@ -430,6 +487,9 @@ public class LibraryService {
             book.setDueDate("");
             book.setReservedBy("");
         }
+        log(TransactionType.RETURN, loan.getBookId(), loan.getMemberId(),
+                "Returned" + (book != null ? " '" + book.getTitle() + "'" : "")
+                        + (late > 0 ? " (" + late + " days late)" : " on time"));
         return loan;
     }
 
@@ -468,6 +528,7 @@ public class LibraryService {
         }
         book.setStatus(BookStatus.RESERVED);
         book.setReservedBy(memberId.trim());
+        log(TransactionType.RESERVE, book.getId(), memberId.trim(), "Reserved '" + book.getTitle() + "'");
         return book;
     }
 
@@ -492,6 +553,8 @@ public class LibraryService {
         }
         book.setStatus(BookStatus.AVAILABLE);
         book.setReservedBy("");
+        log(TransactionType.CANCEL_RESERVATION, book.getId(), memberId.trim(),
+                "Cancelled reservation of '" + book.getTitle() + "'");
         return book;
     }
 
