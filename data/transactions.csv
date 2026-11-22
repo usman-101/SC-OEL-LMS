@@ -1,0 +1,17 @@
+dateTime,type,bookId,memberId,performedBy,details
+2026-11-22 20:30:39,ADD,B001,,system,Added 'Clean Code' by Robert C. Martin (Programming)
+2026-11-22 20:30:39,ADD,B002,,system,Added 'Effective Java' by Joshua Bloch (Programming)
+2026-11-22 20:30:39,ADD,B003,,system,Added 'Head First Java' by Kathy Sierra (Programming)
+2026-11-22 20:30:39,ADD,B004,,system,Added 'Introduction to Algorithms' by Thomas H. Cormen (Programming)
+2026-11-22 20:30:39,ADD,B005,,system,Added 'A Brief History of Time' by Stephen Hawking (Science)
+2026-11-22 20:30:39,ADD,B006,,system,Added 'The Selfish Gene' by Richard Dawkins (Science)
+2026-11-22 20:30:39,ADD,B007,,system,Added 'Cosmos' by Carl Sagan (Science)
+2026-11-22 20:30:39,ADD,B008,,system,Added 'Calculus: Early Transcendentals' by James Stewart (Mathematics)
+2026-11-22 20:30:39,ADD,B009,,system,Added 'Linear Algebra Done Right' by Sheldon Axler (Mathematics)
+2026-11-22 20:30:39,ADD,B010,,system,Added 'Discrete Mathematics' by Kenneth H. Rosen (Mathematics)
+2026-11-22 20:30:39,ADD,B011,,system,Added 'Pride and Prejudice' by Jane Austen (Literature)
+2026-11-22 20:30:39,ADD,B012,,system,Added 'To Kill a Mockingbird' by Harper Lee (Literature)
+2026-11-22 20:30:39,ADD,B013,,system,Added 'Sapiens' by Yuval Noah Harari (History)
+2026-11-22 20:30:39,ADD,B014,,system,Added 'Computer Networks' by Andrew S. Tanenbaum (Technology)
+2026-11-22 20:30:39,ISSUE,B004,MEM-001,system,"Issued 'Introduction to Algorithms' for 14 days, due 2026-11-06"
+2026-11-22 20:30:39,ISSUE,B001,MEM-002,system,"Issued 'Clean Code' for 14 days, due 2026-12-06"
