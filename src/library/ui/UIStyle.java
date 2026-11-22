@@ -347,6 +347,90 @@ public final class UIStyle {
         return l;
     }
 
+    /**
+     * Icon that draws a short emoji/symbol string with an emoji-capable font, so symbols
+     * render correctly next to text that uses Segoe UI (which has no emoji glyphs).
+     *
+     * @author Usman
+     */
+    public static class EmojiIcon implements javax.swing.Icon {
+
+        /** The symbol text to draw. */
+        private final String symbol;
+        /** Font used for the symbol. */
+        private final Font font;
+        /** Colour used for monochrome symbols. */
+        private final Color color;
+
+        /**
+         * Creates an emoji icon.
+         *
+         * @param symbol the symbol text
+         * @param size   font size in points
+         * @param color  colour for monochrome glyphs
+         */
+        public EmojiIcon(String symbol, int size, Color color) {
+            this.symbol = symbol;
+            this.font = new Font("Segoe UI Emoji", Font.PLAIN, size);
+            this.color = color;
+        }
+
+        /**
+         * Paints the symbol.
+         *
+         * @param c the component
+         * @param g the graphics context
+         * @param x left position
+         * @param y top position
+         */
+        @Override
+        public void paintIcon(Component c, Graphics g, int x, int y) {
+            Graphics2D g2 = (Graphics2D) g.create();
+            g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+            g2.setFont(font);
+            g2.setColor(color);
+            FontMetrics fm = g2.getFontMetrics();
+            g2.drawString(symbol, x, y + fm.getAscent());
+            g2.dispose();
+        }
+
+        /**
+         * Returns the icon width.
+         *
+         * @return width in pixels
+         */
+        @Override
+        public int getIconWidth() {
+            return (int) Math.ceil(font.getSize() * 1.35);
+        }
+
+        /**
+         * Returns the icon height.
+         *
+         * @return height in pixels
+         */
+        @Override
+        public int getIconHeight() {
+            return (int) Math.ceil(font.getSize() * 1.45);
+        }
+    }
+
+    /**
+     * Creates a label made of an emoji icon followed by text.
+     *
+     * @param symbol emoji/symbol
+     * @param text   label text
+     * @param font   text font
+     * @param color  text colour
+     * @return the label
+     */
+    public static JLabel iconLabel(String symbol, String text, Font font, Color color) {
+        JLabel l = label(text, font, color);
+        l.setIcon(new EmojiIcon(symbol, font.getSize(), color));
+        l.setIconTextGap(8);
+        return l;
+    }
+
     // ==================== CARDS ====================
 
     /**
@@ -422,7 +506,7 @@ public final class UIStyle {
         p.add(t);
         p.add(javax.swing.Box.createVerticalStrut(2));
         p.add(s);
-        p.setBorder(BorderFactory.createEmptyBorder(0, 0, 12, 0));
+        p.setBorder(BorderFactory.createEmptyBorder(0, 0, 8, 0));
         return p;
     }
 

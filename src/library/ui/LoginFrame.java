@@ -102,18 +102,18 @@ public class LoginFrame extends JFrame {
         p.setOpaque(false);
         p.setLayout(new BoxLayout(p, BoxLayout.Y_AXIS));
 
-        add(p, UIStyle.label("Welcome back", UIStyle.TITLE, UIStyle.TEXT));
-        add(p, UIStyle.label("Sign in to continue to your library account", UIStyle.SMALL, UIStyle.MUTED));
+        addLeft(p, UIStyle.label("Welcome back", UIStyle.TITLE, UIStyle.TEXT));
+        addLeft(p, UIStyle.label("Sign in to continue to your library account", UIStyle.SMALL, UIStyle.MUTED));
         p.add(Box.createVerticalStrut(26));
 
-        add(p, UIStyle.formLabel("Email"));
+        addLeft(p, UIStyle.formLabel("Email"));
         p.add(Box.createVerticalStrut(5));
-        add(p, fullWidth(emailField));
+        addLeft(p, fullWidth(emailField));
         p.add(Box.createVerticalStrut(14));
 
-        add(p, UIStyle.formLabel("Password"));
+        addLeft(p, UIStyle.formLabel("Password"));
         p.add(Box.createVerticalStrut(5));
-        add(p, fullWidth(passwordField));
+        addLeft(p, fullWidth(passwordField));
         p.add(Box.createVerticalStrut(6));
 
         JCheckBox show = new JCheckBox("Show password");
@@ -121,21 +121,21 @@ public class LoginFrame extends JFrame {
         show.setForeground(UIStyle.MUTED);
         char echo = passwordField.getEchoChar();
         show.addActionListener(e -> passwordField.setEchoChar(show.isSelected() ? (char) 0 : echo));
-        add(p, show);
+        addLeft(p, show);
         p.add(Box.createVerticalStrut(18));
 
         signInButton.addActionListener(e -> doSignIn());
-        add(p, fullWidth(signInButton));
+        addLeft(p, fullWidth(signInButton));
         p.add(Box.createVerticalStrut(16));
 
-        add(p, UIStyle.linkLabel("Don't have an account? <b><font color='#3B82F6'>Sign Up</font></b>",
+        addLeft(p, UIStyle.linkLabel("Don't have an account? <b><font color='#3B82F6'>Sign Up</font></b>",
                 this::showSignUp));
         p.add(Box.createVerticalGlue());
 
         JLabel hint = UIStyle.label("<html><div style='width:300px'>Tip: librarian accounts use an email like "
                 + "<b>name.admin@library.com</b>. Any other email signs in as a student.</div></html>",
                 UIStyle.SMALL, UIStyle.MUTED);
-        add(p, hint);
+        addLeft(p, hint);
         return p;
     }
 
@@ -145,7 +145,7 @@ public class LoginFrame extends JFrame {
      * @param p the panel
      * @param c the component
      */
-    static void add(JPanel p, JComponent c) {
+    static void addLeft(JPanel p, JComponent c) {
         c.setAlignmentX(Component.LEFT_ALIGNMENT);
         p.add(c);
     }
@@ -225,18 +225,18 @@ public class LoginFrame extends JFrame {
             inner.setOpaque(false);
             inner.setLayout(new BoxLayout(inner, BoxLayout.Y_AXIS));
 
-            JLabel logo = UIStyle.label("📚", new java.awt.Font("Segoe UI Emoji", java.awt.Font.PLAIN, 54), Color.WHITE);
-            add(inner, logo);
+            JLabel logo = UIStyle.label("\uD83D\uDCDA", new java.awt.Font("Segoe UI Emoji", java.awt.Font.PLAIN, 54), Color.WHITE);
+            addLeft(inner, logo);
             inner.add(Box.createVerticalStrut(12));
-            add(inner, UIStyle.label("Library Book", new java.awt.Font(UIStyle.FONT_FAMILY, java.awt.Font.BOLD, 34), Color.WHITE));
-            add(inner, UIStyle.label("Management System", new java.awt.Font(UIStyle.FONT_FAMILY, java.awt.Font.BOLD, 34), Color.WHITE));
+            addLeft(inner, UIStyle.label("Library Book", new java.awt.Font(UIStyle.FONT_FAMILY, java.awt.Font.BOLD, 34), Color.WHITE));
+            addLeft(inner, UIStyle.label("Management System", new java.awt.Font(UIStyle.FONT_FAMILY, java.awt.Font.BOLD, 34), Color.WHITE));
             inner.add(Box.createVerticalStrut(12));
-            add(inner, UIStyle.label("Organise books, members and loans in one place.", UIStyle.BODY, new Color(0xC7D2FE)));
+            addLeft(inner, UIStyle.label("Organise books, members and loans in one place.", UIStyle.BODY, new Color(0xC7D2FE)));
             inner.add(Box.createVerticalStrut(30));
             String[] features = {"Role-based Admin and Student panels", "Issue, return and reserve books",
                     "Overdue tracking and statistics", "Complete transaction history"};
             for (String f : features) {
-                add(inner, UIStyle.label("✔  " + f, UIStyle.BODY, Color.WHITE));
+                addLeft(inner, UIStyle.iconLabel("\u2705", f, UIStyle.BODY, Color.WHITE));
                 inner.add(Box.createVerticalStrut(10));
             }
             add(inner);

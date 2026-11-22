@@ -61,13 +61,13 @@ public class SignUpPanel extends JPanel {
         setOpaque(false);
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
-        LoginFrame.add(this, UIStyle.label("Create account", UIStyle.TITLE, UIStyle.TEXT));
-        LoginFrame.add(this, UIStyle.label("Join the library in a few seconds", UIStyle.SMALL, UIStyle.MUTED));
+        LoginFrame.addLeft(this, UIStyle.label("Create account", UIStyle.TITLE, UIStyle.TEXT));
+        LoginFrame.addLeft(this, UIStyle.label("Join the library in a few seconds", UIStyle.SMALL, UIStyle.MUTED));
         add(Box.createVerticalStrut(16));
 
         field("Full Name", nameField);
         field("Email", emailField);
-        LoginFrame.add(this, roleHint);
+        LoginFrame.addLeft(this, roleHint);
         add(Box.createVerticalStrut(6));
         field("Password (min 6 characters)", passwordField);
         field("Confirm Password", confirmField);
@@ -76,9 +76,9 @@ public class SignUpPanel extends JPanel {
 
         add(Box.createVerticalStrut(6));
         submitButton.addActionListener(e -> doSignUp());
-        LoginFrame.add(this, LoginFrame.fullWidth(submitButton));
+        LoginFrame.addLeft(this, LoginFrame.fullWidth(submitButton));
         add(Box.createVerticalStrut(12));
-        LoginFrame.add(this, UIStyle.linkLabel("Already have an account? <b><font color='#3B82F6'>Sign In</font></b>",
+        LoginFrame.addLeft(this, UIStyle.linkLabel("Already have an account? <b><font color='#3B82F6'>Sign In</font></b>",
                 () -> owner.showSignIn(null)));
 
         emailField.getDocument().addDocumentListener(new DocumentListener() {
@@ -116,9 +116,9 @@ public class SignUpPanel extends JPanel {
      * @param input the input component
      */
     private void field(JLabel label, JTextField input) {
-        LoginFrame.add(this, label);
+        LoginFrame.addLeft(this, label);
         add(Box.createVerticalStrut(4));
-        LoginFrame.add(this, LoginFrame.fullWidth(input));
+        LoginFrame.addLeft(this, LoginFrame.fullWidth(input));
         add(Box.createVerticalStrut(9));
     }
 

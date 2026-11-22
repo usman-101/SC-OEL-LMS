@@ -56,6 +56,7 @@ public class MainFrame extends JFrame {
         setMinimumSize(UIStyle.MIN_WINDOW);
         setSize(1240, 760);
         setLocationRelativeTo(null);
+        setExtendedState(JFrame.MAXIMIZED_BOTH);
 
         JPanel root = new JPanel(new BorderLayout());
         root.setBackground(UIStyle.BACKGROUND);
@@ -73,6 +74,9 @@ public class MainFrame extends JFrame {
      * @return the role panel
      */
     private JPanel createRolePanel() {
+        if (user.getRole() == Role.ADMIN) {
+            return new AdminPanel(this);
+        }
         JPanel placeholder = new JPanel(new GridBagLayout());
         placeholder.setBackground(UIStyle.BACKGROUND);
         placeholder.add(UIStyle.label(user.getRole().getDisplayName() + " panel", UIStyle.HEADER, UIStyle.MUTED));
@@ -93,7 +97,7 @@ public class MainFrame extends JFrame {
 
         JPanel left = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
         left.setOpaque(false);
-        left.add(UIStyle.label("📚", new java.awt.Font("Segoe UI Emoji", java.awt.Font.PLAIN, 22), UIStyle.NAVY));
+        left.add(UIStyle.label("\uD83D\uDCDA", new java.awt.Font("Segoe UI Emoji", java.awt.Font.PLAIN, 22), UIStyle.NAVY));
         left.add(UIStyle.label("Library Book Management System", UIStyle.HEADER, UIStyle.NAVY));
         header.add(left, BorderLayout.WEST);
 
