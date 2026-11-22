@@ -19,6 +19,15 @@ import java.util.stream.Collectors;
  */
 public class LibraryService {
 
+    /** Search-by option: match on the book ID. */
+    public static final String SEARCH_BY_ID = "Book ID";
+    /** Search-by option: match on the title. */
+    public static final String SEARCH_BY_TITLE = "Title";
+    /** Search-by option: match on the author. */
+    public static final String SEARCH_BY_AUTHOR = "Author";
+    /** Filter value meaning "no filter". */
+    public static final String ALL = "All";
+
     private final List<Book> books;
     private final List<Loan> loans;
     private int loanCounter;
@@ -255,17 +264,45 @@ public class LibraryService {
         if (query == null || query.trim().isEmpty()) {
             return new ArrayList<>(books);
         }
-        String q = query.trim().toLowerCase();
-        return books.stream().filter(b -> {
-            switch (searchBy) {
-                case "Book ID": return b.getId().toLowerCase().contains(q);
-                case "Title": return b.getTitle().toLowerCase().contains(q);
-                case "Author": return b.getAuthor().toLowerCase().contains(q);
-                default: return b.getId().toLowerCase().contains(q) ||
-                               b.getTitle().toLowerCase().contains(q) ||
-                               b.getAuthor().toLowerCase().contains(q);
-            }
-        }).collect(Collectors.toList());
+        String q = query.trim().toLowerCase(Locale.ROOT);
+        String field = searchBy == null ? "" : searchBy.trim();
+        return books.stream().filter(b -> matches(b, q, field)).collect(Collectors.toList());
+    }
+
+    /**
+     * Checks whether a book matches a lower-case query on the given field.
+     *
+     * @param b     the book
+     * @param q     the lower-case query
+     * @param field "Book ID", "Title", "Author" or anything else for all fields
+     * @return true if the book matches
+     */
+    private boolean matches(Book b, String q, String field) {
+        String id = b.getId().toLowerCase(Locale.ROOT);
+        String title = b.getTitle().toLowerCase(Locale.ROOT);
+        String author = b.getAuthor().toLowerCase(Locale.ROOT);
+        switch (field) {
+            case SEARCH_BY_ID: return id.contains(q);
+            case SEARCH_BY_TITLE: return title.contains(q);
+            case SEARCH_BY_AUTHOR: return author.contains(q);
+            default: return id.contains(q) || title.contains(q) || author.contains(q);
+        }
+    }
+
+    /**
+     * Combined search and filter used by the GUI search bar: partial, case-insensitive
+     * search on one field, then filtering by status and category.
+     *
+     * @param query    the search text (may be empty)
+     * @param searchBy "Book ID", "Title" or "Author"
+     * @param status   status display name or "All"
+     * @param category category display name or "All"
+     * @return the matching books
+     */
+    public List<Book> searchAndFilter(String query, String searchBy, String status, String category) {
+        List<Book> result = search(query, searchBy);
+        result = filterByStatus(result, status);
+        return filterByCategory(result, category);
     }
 
     /**
@@ -276,10 +313,10 @@ public class LibraryService {
      * @return filtered list of books
      */
     public List<Book> filterByStatus(List<Book> bookList, String status) {
-        if (status == null || status.trim().isEmpty() || status.equalsIgnoreCase("All")) {
+        if (status == null || status.trim().isEmpty() || status.trim().equalsIgnoreCase(ALL)) {
             return new ArrayList<>(bookList);
         }
-        BookStatus bs = BookStatus.fromString(status);
+        BookStatus bs = BookStatus.fromString(status.trim());
         return bookList.stream().filter(b -> b.getStatus() == bs).collect(Collectors.toList());
     }
 
@@ -291,10 +328,10 @@ public class LibraryService {
      * @return filtered list of books
      */
     public List<Book> filterByCategory(List<Book> bookList, String category) {
-        if (category == null || category.trim().isEmpty() || category.equalsIgnoreCase("All")) {
+        if (category == null || category.trim().isEmpty() || category.trim().equalsIgnoreCase(ALL)) {
             return new ArrayList<>(bookList);
         }
-        Category cat = Category.fromString(category);
+        Category cat = Category.fromString(category.trim());
         return bookList.stream().filter(b -> b.getCategory() == cat).collect(Collectors.toList());
     }
 
