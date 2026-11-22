@@ -5,6 +5,7 @@ import library.model.*;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -31,6 +32,17 @@ public class LibraryService {
     private final List<Book> books;
     private final List<Loan> loans;
     private int loanCounter;
+    /** Member service used to validate member IDs and count members (may be null). */
+    private MemberService memberService;
+
+    /**
+     * Connects the member service so issuing validates member IDs and statistics include members.
+     *
+     * @param memberService the member service
+     */
+    public void setMemberService(MemberService memberService) {
+        this.memberService = memberService;
+    }
 
     /**
      * Constructs a new LibraryService with empty book and loan lists.
@@ -361,6 +373,9 @@ public class LibraryService {
             throw new LibraryException("Member ID cannot be empty.");
         }
         String mid = memberId.trim();
+        if (memberService != null) {
+            mid = memberService.requireMember(mid).getMemberId();
+        }
         if (loanDays < 1 || loanDays > MAX_LOAN_DAYS) {
             throw new LibraryException("Loan period must be between 1 and " + MAX_LOAN_DAYS + " days.");
         }
@@ -581,11 +596,32 @@ public class LibraryService {
      * @return list of overdue loans
      */
     public List<Loan> getOverdueLoans() {
-        LocalDate today = LocalDate.now();
-        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        return loans.stream()
-                .filter(l -> l.isActive() && LocalDate.parse(l.getDueDate(), fmt).isBefore(today))
+        return loans.stream().filter(this::isOverdue).collect(Collectors.toList());
+    }
+
+    /**
+     * Returns overdue loans belonging to one member.
+     *
+     * @param memberId the member ID
+     * @return the member's overdue loans
+     */
+    public List<Loan> getOverdueLoansByMember(String memberId) {
+        if (memberId == null) return new ArrayList<>();
+        return getOverdueLoans().stream()
+                .filter(l -> l.getMemberId().equalsIgnoreCase(memberId.trim()))
                 .collect(Collectors.toList());
+    }
+
+    /**
+     * Checks whether a loan is overdue: still active and its due date is before today.
+     *
+     * @param loan the loan
+     * @return true if overdue
+     */
+    public boolean isOverdue(Loan loan) {
+        if (loan == null || !loan.isActive()) return false;
+        LocalDate due = parseDate(loan.getDueDate());
+        return due != null && due.isBefore(LocalDate.now());
     }
 
     /**
@@ -595,30 +631,69 @@ public class LibraryService {
      * @return the number of days overdue (0 if not overdue)
      */
     public long getDaysOverdue(Loan loan) {
-        LocalDate today = LocalDate.now();
-        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        LocalDate due = LocalDate.parse(loan.getDueDate(), fmt);
-        long days = ChronoUnit.DAYS.between(due, today);
+        if (loan == null) return 0;
+        LocalDate due = parseDate(loan.getDueDate());
+        if (due == null) return 0;
+        long days = ChronoUnit.DAYS.between(due, LocalDate.now());
         return days > 0 ? days : 0;
+    }
+
+    /**
+     * Parses a yyyy-MM-dd date safely.
+     *
+     * @param text the date text
+     * @return the parsed date, or null if the text is empty or invalid
+     */
+    private static LocalDate parseDate(String text) {
+        if (text == null || text.trim().isEmpty()) return null;
+        try {
+            return LocalDate.parse(text.trim(), DATE_FMT);
+        } catch (DateTimeParseException e) {
+            return null;
+        }
     }
 
     // ==================== STATISTICS ====================
 
+    /** Statistics key: total number of books. */
+    public static final String STAT_TOTAL = "totalBooks";
+    /** Statistics key: number of available books. */
+    public static final String STAT_AVAILABLE = "availableBooks";
+    /** Statistics key: number of issued books. */
+    public static final String STAT_ISSUED = "issuedBooks";
+    /** Statistics key: number of reserved books. */
+    public static final String STAT_RESERVED = "reservedBooks";
+    /** Statistics key: number of registered members. */
+    public static final String STAT_MEMBERS = "totalMembers";
+    /** Statistics key: number of overdue loans. */
+    public static final String STAT_OVERDUE = "overdueCount";
+
     /**
      * Returns a map of library statistics.
      * Keys: totalBooks, availableBooks, issuedBooks, reservedBooks, totalMembers, overdueCount.
-     * Note: totalMembers should be set by the caller since MemberService manages members.
+     * totalMembers is taken from the connected {@link MemberService} (0 if none is connected).
      *
      * @return map of statistic name to value
      */
     public Map<String, Integer> getStatistics() {
         Map<String, Integer> stats = new LinkedHashMap<>();
-        stats.put("totalBooks", books.size());
-        stats.put("availableBooks", (int) books.stream().filter(b -> b.getStatus() == BookStatus.AVAILABLE).count());
-        stats.put("issuedBooks", (int) books.stream().filter(b -> b.getStatus() == BookStatus.ISSUED).count());
-        stats.put("reservedBooks", (int) books.stream().filter(b -> b.getStatus() == BookStatus.RESERVED).count());
-        stats.put("overdueCount", getOverdueLoans().size());
+        stats.put(STAT_TOTAL, books.size());
+        stats.put(STAT_AVAILABLE, countByStatus(BookStatus.AVAILABLE));
+        stats.put(STAT_ISSUED, countByStatus(BookStatus.ISSUED));
+        stats.put(STAT_RESERVED, countByStatus(BookStatus.RESERVED));
+        stats.put(STAT_MEMBERS, memberService != null ? memberService.count() : 0);
+        stats.put(STAT_OVERDUE, getOverdueLoans().size());
         return stats;
+    }
+
+    /**
+     * Counts books with the given status.
+     *
+     * @param status the status
+     * @return number of books with that status
+     */
+    public int countByStatus(BookStatus status) {
+        return (int) books.stream().filter(b -> b.getStatus() == status).count();
     }
 
     // ==================== VALIDATION ====================
