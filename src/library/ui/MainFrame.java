@@ -15,7 +15,6 @@ import javax.swing.WindowConstants;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.FlowLayout;
-import java.awt.GridBagLayout;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -74,13 +73,7 @@ public class MainFrame extends JFrame {
      * @return the role panel
      */
     private JPanel createRolePanel() {
-        if (user.getRole() == Role.ADMIN) {
-            return new AdminPanel(this);
-        }
-        JPanel placeholder = new JPanel(new GridBagLayout());
-        placeholder.setBackground(UIStyle.BACKGROUND);
-        placeholder.add(UIStyle.label(user.getRole().getDisplayName() + " panel", UIStyle.HEADER, UIStyle.MUTED));
-        return placeholder;
+        return user.getRole() == Role.ADMIN ? new AdminPanel(this) : new StudentPanel(this);
     }
 
     /**

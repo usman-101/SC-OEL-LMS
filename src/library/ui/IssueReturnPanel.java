@@ -80,6 +80,8 @@ public class IssueReturnPanel extends JPanel implements Refreshable {
         table.getColumnModel().getColumn(1).setPreferredWidth(220);
         table.getColumnModel().getColumn(2).setPreferredWidth(170);
         table.getColumnModel().getColumn(5).setPreferredWidth(150);
+        table.getColumnModel().getColumn(3).setMinWidth(95);
+        table.getColumnModel().getColumn(4).setMinWidth(95);
 
         UIStyle.RoundedPanel loansCard = new UIStyle.RoundedPanel(new BorderLayout(0, 10));
         JPanel head = new JPanel(new BorderLayout());

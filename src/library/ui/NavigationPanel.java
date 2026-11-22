@@ -65,6 +65,20 @@ public abstract class NavigationPanel extends JPanel implements Refreshable {
     }
 
     /**
+     * Places a bar above the page content (used by the student panel for its welcome summary).
+     *
+     * @param bar the component to show above the pages
+     */
+    protected void setTopBar(javax.swing.JComponent bar) {
+        remove(content);
+        JPanel wrap = new JPanel(new BorderLayout());
+        wrap.setBackground(UIStyle.BACKGROUND);
+        wrap.add(bar, BorderLayout.NORTH);
+        wrap.add(content, BorderLayout.CENTER);
+        add(wrap, BorderLayout.CENTER);
+    }
+
+    /**
      * Adds the Logout item at the bottom of the sidebar.
      */
     protected void addLogout() {

@@ -125,12 +125,12 @@ public class LibrarySystem {
         authService.signUp("Usman", "usman.admin@library.com", "Admin@123", "Admin@123", AuthService.ADMIN_ACCESS_CODE);
         authService.signUp("Ali Khan", "ali@gmail.com", "Student@123", "Student@123", "");
 
-        // One active loan that is already overdue (issued 30 days ago for 14 days).
-        libraryService.issueBook("B004", sara.getMemberId(), LibraryService.DEFAULT_LOAN_DAYS,
+        // The sample student has one active loan that is already overdue (issued 30 days ago for 14 days).
+        libraryService.issueBook("B004", ali.getMemberId(), LibraryService.DEFAULT_LOAN_DAYS,
                 LocalDate.now().minusDays(30));
 
-        // One normal (not overdue) loan for the sample student.
-        libraryService.issueBook("B001", ali.getMemberId(), LibraryService.DEFAULT_LOAN_DAYS);
+        // One normal (not overdue) loan for the second member.
+        libraryService.issueBook("B001", sara.getMemberId(), LibraryService.DEFAULT_LOAN_DAYS);
         libraryService.setActor(previousActor);
     }
 
