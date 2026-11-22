@@ -3,7 +3,6 @@ package library.service;
 import library.exception.LibraryException;
 import library.model.Book;
 import library.model.Category;
-import library.model.Loan;
 import library.model.Member;
 import library.storage.DataStore;
 
@@ -127,12 +126,8 @@ public class LibrarySystem {
         authService.signUp("Ali Khan", "ali@gmail.com", "Student@123", "Student@123", "");
 
         // One active loan that is already overdue (issued 30 days ago for 14 days).
-        Loan overdue = libraryService.issueBook("B004", sara.getMemberId(), LibraryService.DEFAULT_LOAN_DAYS);
-        LocalDate issued = LocalDate.now().minusDays(30);
-        LocalDate due = issued.plusDays(LibraryService.DEFAULT_LOAN_DAYS);
-        overdue.setIssueDate(issued.format(LibraryService.DATE_FMT));
-        overdue.setDueDate(due.format(LibraryService.DATE_FMT));
-        libraryService.findById("B004").setDueDate(due.format(LibraryService.DATE_FMT));
+        libraryService.issueBook("B004", sara.getMemberId(), LibraryService.DEFAULT_LOAN_DAYS,
+                LocalDate.now().minusDays(30));
 
         // One normal (not overdue) loan for the sample student.
         libraryService.issueBook("B001", ali.getMemberId(), LibraryService.DEFAULT_LOAN_DAYS);

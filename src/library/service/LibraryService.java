@@ -422,6 +422,25 @@ public class LibraryService {
      * @throws LibraryException if input is invalid or the book is not available for issue
      */
     public Loan issueBook(String bookId, String memberId, int loanDays) throws LibraryException {
+        return issueBook(bookId, memberId, loanDays, LocalDate.now());
+    }
+
+    /**
+     * Issues a book with an explicit issue date (used for seeding sample data and tests,
+     * e.g. to create a loan that is already overdue). Same rules as
+     * {@link #issueBook(String, String, int)}.
+     *
+     * @param bookId    the book ID to issue
+     * @param memberId  the member ID to issue to
+     * @param loanDays  the loan period in days
+     * @param issueDate the issue date (due date = issue date + loan days)
+     * @return the created Loan
+     * @throws LibraryException if input is invalid or the book is not available for issue
+     */
+    public Loan issueBook(String bookId, String memberId, int loanDays, LocalDate issueDate) throws LibraryException {
+        if (issueDate == null) {
+            throw new LibraryException("Issue date cannot be empty.");
+        }
         Book book = requireBook(bookId);
         if (memberId == null || memberId.trim().isEmpty()) {
             throw new LibraryException("Member ID cannot be empty.");
@@ -440,7 +459,6 @@ public class LibraryService {
             throw new LibraryException("Book '" + book.getTitle() + "' is reserved by another member.");
         }
 
-        LocalDate issueDate = LocalDate.now();
         LocalDate dueDate = issueDate.plusDays(loanDays);
         Loan loan = new Loan(nextLoanId(), book.getId(), mid,
                 issueDate.format(DATE_FMT), dueDate.format(DATE_FMT));
