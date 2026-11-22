@@ -337,46 +337,48 @@ public class LibraryService {
 
     // ==================== ISSUE / RETURN / RESERVE ====================
 
+    /** Default loan period in days. */
+    public static final int DEFAULT_LOAN_DAYS = 14;
+    /** Maximum allowed loan period in days. */
+    public static final int MAX_LOAN_DAYS = 365;
+    /** Date format used for all stored dates. */
+    public static final DateTimeFormatter DATE_FMT = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
     /**
      * Issues a book to a member. Only AVAILABLE books (or books RESERVED by the same member)
-     * can be issued. Creates a loan record with issue and due dates.
+     * can be issued. Creates a loan record with issue date (today) and due date
+     * (today + loan period) using {@link LocalDate}.
      *
      * @param bookId    the book ID to issue
      * @param memberId  the member ID to issue to
-     * @param loanDays  the loan period in days
+     * @param loanDays  the loan period in days (1 to {@value #MAX_LOAN_DAYS})
      * @return the created Loan
-     * @throws LibraryException if the book is not available for issue
+     * @throws LibraryException if input is invalid or the book is not available for issue
      */
     public Loan issueBook(String bookId, String memberId, int loanDays) throws LibraryException {
-        if (bookId == null || bookId.trim().isEmpty()) {
-            throw new LibraryException("Book ID cannot be empty.");
-        }
+        Book book = requireBook(bookId);
         if (memberId == null || memberId.trim().isEmpty()) {
             throw new LibraryException("Member ID cannot be empty.");
         }
-        Book book = findById(bookId);
-        if (book == null) {
-            throw new LibraryException("Book with ID '" + bookId.trim() + "' not found.");
+        String mid = memberId.trim();
+        if (loanDays < 1 || loanDays > MAX_LOAN_DAYS) {
+            throw new LibraryException("Loan period must be between 1 and " + MAX_LOAN_DAYS + " days.");
         }
-        if (book.getStatus() == BookStatus.ISSUED) {
+        if (book.getStatus() == BookStatus.ISSUED || hasActiveLoan(book.getId())) {
             throw new LibraryException("Book '" + book.getTitle() + "' is already issued.");
         }
-        if (book.getStatus() == BookStatus.RESERVED && !book.getReservedBy().equalsIgnoreCase(memberId.trim())) {
+        if (book.getStatus() == BookStatus.RESERVED && !book.getReservedBy().equalsIgnoreCase(mid)) {
             throw new LibraryException("Book '" + book.getTitle() + "' is reserved by another member.");
         }
 
         LocalDate issueDate = LocalDate.now();
-        LocalDate dueDate = issueDate.plusDays(loanDays > 0 ? loanDays : 14);
-        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-
-        loanCounter++;
-        String loanId = "LOAN-" + String.format("%03d", loanCounter);
-        Loan loan = new Loan(loanId, bookId.trim(), memberId.trim(),
-                issueDate.format(fmt), dueDate.format(fmt));
+        LocalDate dueDate = issueDate.plusDays(loanDays);
+        Loan loan = new Loan(nextLoanId(), book.getId(), mid,
+                issueDate.format(DATE_FMT), dueDate.format(DATE_FMT));
 
         book.setStatus(BookStatus.ISSUED);
-        book.setIssuedTo(memberId.trim());
-        book.setDueDate(dueDate.format(fmt));
+        book.setIssuedTo(mid);
+        book.setDueDate(dueDate.format(DATE_FMT));
         book.setReservedBy("");
 
         loans.add(loan);
@@ -384,7 +386,8 @@ public class LibraryService {
     }
 
     /**
-     * Returns a book from an active loan. Sets the book status back to AVAILABLE.
+     * Returns a book from an active loan. Records the return date and
+     * automatically sets the book status back to AVAILABLE.
      *
      * @param loanId the loan ID to return
      * @return the updated Loan
@@ -392,7 +395,7 @@ public class LibraryService {
      */
     public Loan returnBook(String loanId) throws LibraryException {
         if (loanId == null || loanId.trim().isEmpty()) {
-            throw new LibraryException("Loan ID cannot be empty.");
+            throw new LibraryException("Please select a loan to return.");
         }
         Loan loan = findLoanById(loanId);
         if (loan == null) {
@@ -402,8 +405,7 @@ public class LibraryService {
             throw new LibraryException("This loan has already been returned.");
         }
 
-        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        loan.setReturnDate(LocalDate.now().format(fmt));
+        loan.setReturnDate(LocalDate.now().format(DATE_FMT));
         loan.setActive(false);
 
         Book book = findById(loan.getBookId());
@@ -411,56 +413,114 @@ public class LibraryService {
             book.setStatus(BookStatus.AVAILABLE);
             book.setIssuedTo("");
             book.setDueDate("");
+            book.setReservedBy("");
         }
-
         return loan;
     }
 
     /**
-     * Reserves an available book for a member.
+     * Returns a book using its book ID (finds the active loan automatically).
      *
-     * @param bookId   the book ID to reserve
-     * @param memberId the member ID reserving the book
-     * @throws LibraryException if the book is not available for reservation
+     * @param bookId the book ID
+     * @return the closed loan
+     * @throws LibraryException if the book does not exist or is not on loan
      */
-    public void reserveBook(String bookId, String memberId) throws LibraryException {
-        if (bookId == null || bookId.trim().isEmpty()) {
-            throw new LibraryException("Book ID cannot be empty.");
+    public Loan returnBookByBookId(String bookId) throws LibraryException {
+        Book book = requireBook(bookId);
+        Loan loan = findActiveLoanForBook(book.getId());
+        if (loan == null) {
+            throw new LibraryException("Book '" + book.getTitle() + "' is not currently issued.");
         }
-        Book book = findById(bookId);
-        if (book == null) {
-            throw new LibraryException("Book with ID '" + bookId.trim() + "' not found.");
-        }
-        if (book.getStatus() != BookStatus.AVAILABLE) {
-            throw new LibraryException("Book '" + book.getTitle() + "' is not available for reservation.");
-        }
-        book.setStatus(BookStatus.RESERVED);
-        book.setReservedBy(memberId.trim());
+        return returnBook(loan.getLoanId());
     }
 
     /**
-     * Cancels a reservation on a book.
+     * Reserves an available book for a member. Status becomes RESERVED.
+     *
+     * @param bookId   the book ID to reserve
+     * @param memberId the member ID reserving the book
+     * @return the reserved book
+     * @throws LibraryException if input is empty or the book is not AVAILABLE
+     */
+    public Book reserveBook(String bookId, String memberId) throws LibraryException {
+        Book book = requireBook(bookId);
+        if (memberId == null || memberId.trim().isEmpty()) {
+            throw new LibraryException("Member ID cannot be empty.");
+        }
+        if (book.getStatus() != BookStatus.AVAILABLE) {
+            throw new LibraryException("Book '" + book.getTitle() + "' is "
+                    + book.getStatus().getDisplayName() + " and cannot be reserved. Only Available books can be reserved.");
+        }
+        book.setStatus(BookStatus.RESERVED);
+        book.setReservedBy(memberId.trim());
+        return book;
+    }
+
+    /**
+     * Cancels a member's own reservation on a book. Status returns to AVAILABLE.
      *
      * @param bookId   the book ID
      * @param memberId the member ID who made the reservation
+     * @return the book whose reservation was cancelled
      * @throws LibraryException if the book is not reserved by this member
      */
-    public void cancelReservation(String bookId, String memberId) throws LibraryException {
-        if (bookId == null || bookId.trim().isEmpty()) {
-            throw new LibraryException("Book ID cannot be empty.");
-        }
-        Book book = findById(bookId);
-        if (book == null) {
-            throw new LibraryException("Book with ID '" + bookId.trim() + "' not found.");
+    public Book cancelReservation(String bookId, String memberId) throws LibraryException {
+        Book book = requireBook(bookId);
+        if (memberId == null || memberId.trim().isEmpty()) {
+            throw new LibraryException("Member ID cannot be empty.");
         }
         if (book.getStatus() != BookStatus.RESERVED) {
             throw new LibraryException("Book '" + book.getTitle() + "' is not reserved.");
         }
         if (!book.getReservedBy().equalsIgnoreCase(memberId.trim())) {
-            throw new LibraryException("This book is reserved by a different member.");
+            throw new LibraryException("You can only cancel your own reservations.");
         }
         book.setStatus(BookStatus.AVAILABLE);
         book.setReservedBy("");
+        return book;
+    }
+
+    /**
+     * Returns books currently reserved by a member.
+     *
+     * @param memberId the member ID
+     * @return list of reserved books
+     */
+    public List<Book> getReservedBooksByMember(String memberId) {
+        if (memberId == null) return new ArrayList<>();
+        return books.stream()
+                .filter(b -> b.getStatus() == BookStatus.RESERVED && b.getReservedBy().equalsIgnoreCase(memberId.trim()))
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Generates the next unique loan ID (LOAN-001, LOAN-002, ...), based on the highest existing number.
+     *
+     * @return the next loan ID
+     */
+    private String nextLoanId() {
+        int max = loanCounter;
+        for (Loan l : loans) {
+            max = Math.max(max, numericSuffix(l.getLoanId()));
+        }
+        loanCounter = max + 1;
+        return String.format("LOAN-%03d", loanCounter);
+    }
+
+    /**
+     * Extracts the trailing number of an ID such as "LOAN-012".
+     *
+     * @param id the ID
+     * @return the numeric suffix, or 0 if none
+     */
+    static int numericSuffix(String id) {
+        if (id == null) return 0;
+        String digits = id.replaceAll("^.*?(\\d+)$", "$1");
+        try {
+            return digits.matches("\\d+") ? Integer.parseInt(digits) : 0;
+        } catch (NumberFormatException e) {
+            return 0;
+        }
     }
 
     // ==================== LOANS ====================
