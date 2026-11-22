@@ -24,6 +24,8 @@ public class LibrarySystem {
     private final LibraryService libraryService;
     /** Member management. */
     private final MemberService memberService;
+    /** Sign up / sign in. */
+    private final AuthService authService;
     /** Transaction log. */
     private final TransactionService transactionService;
     /** File storage, or null for in-memory mode. */
@@ -42,6 +44,7 @@ public class LibrarySystem {
         this.libraryService.setMemberService(memberService);
         this.libraryService.setTransactionService(transactionService);
         this.memberService.setLibraryService(libraryService);
+        this.authService = new AuthService(memberService);
         this.dataStore = dataDir == null ? null : new DataStore(dataDir);
     }
 
@@ -66,6 +69,7 @@ public class LibrarySystem {
             save();
             return;
         }
+        authService.setUsers(dataStore.loadUsers());
         memberService.setMembers(dataStore.loadMembers());
         libraryService.setBooks(dataStore.loadBooks());
         libraryService.setLoans(dataStore.loadLoans());
@@ -79,6 +83,7 @@ public class LibrarySystem {
      */
     public void save() throws LibraryException {
         if (dataStore == null) return;
+        dataStore.saveUsers(authService.getAllUsers());
         dataStore.saveMembers(memberService.getAllMembers());
         dataStore.saveBooks(libraryService.getAllBooks());
         dataStore.saveLoans(libraryService.getAllLoans());
@@ -86,7 +91,8 @@ public class LibrarySystem {
     }
 
     /**
-     * Seeds sample data: 14 books across categories, 2 members and one overdue loan.
+     * Seeds sample data: default admin and student accounts, 14 books across categories,
+     * 2 members and one overdue loan.
      *
      * @throws LibraryException if seeding fails (should not happen with the built-in data)
      */
@@ -116,6 +122,10 @@ public class LibrarySystem {
         Member ali = memberService.registerMember("Ali Khan", "0300-1234567", "ali@gmail.com");
         Member sara = memberService.registerMember("Sara Ahmed", "0321-7654321", "sara.ahmed@gmail.com");
 
+        // Default accounts (the student links to the existing member record by email).
+        authService.signUp("Usman", "usman.admin@library.com", "Admin@123", "Admin@123", AuthService.ADMIN_ACCESS_CODE);
+        authService.signUp("Ali Khan", "ali@gmail.com", "Student@123", "Student@123", "");
+
         // One active loan that is already overdue (issued 30 days ago for 14 days).
         Loan overdue = libraryService.issueBook("B004", sara.getMemberId(), LibraryService.DEFAULT_LOAN_DAYS);
         LocalDate issued = LocalDate.now().minusDays(30);
@@ -136,6 +146,15 @@ public class LibrarySystem {
      */
     public LibraryService getLibraryService() {
         return libraryService;
+    }
+
+    /**
+     * Returns the authentication service.
+     *
+     * @return the auth service
+     */
+    public AuthService getAuthService() {
+        return authService;
     }
 
     /**
