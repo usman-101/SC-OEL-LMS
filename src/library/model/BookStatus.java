@@ -14,6 +14,7 @@ public enum BookStatus {
     /** Book is reserved by a member. */
     RESERVED("Reserved");
 
+    /** Human-readable name shown in the GUI. */
     private final String displayName;
 
     /**

@@ -8,12 +8,19 @@ package library.model;
  */
 public class Loan {
 
+    /** Unique loan ID, e.g. LOAN-001. */
     private String loanId;
+    /** ID of the loaned book. */
     private String bookId;
+    /** ID of the borrowing member. */
     private String memberId;
+    /** Issue date (yyyy-MM-dd). */
     private String issueDate;
+    /** Due date (yyyy-MM-dd). */
     private String dueDate;
+    /** Return date (yyyy-MM-dd), empty while the loan is active. */
     private String returnDate;
+    /** True while the book has not been returned. */
     private boolean active;
 
     /**

@@ -29,8 +29,11 @@ public class LibraryService {
     /** Filter value meaning "no filter". */
     public static final String ALL = "All";
 
+    /** All books in the library. */
     private final List<Book> books;
+    /** All loans (active and returned). */
     private final List<Loan> loans;
+    /** Highest loan number issued so far. */
     private int loanCounter;
     /** Member service used to validate member IDs and count members (may be null). */
     private MemberService memberService;

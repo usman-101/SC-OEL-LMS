@@ -24,6 +24,7 @@ public enum TransactionType {
     /** A reservation was cancelled. */
     CANCEL_RESERVATION("Cancel Reservation");
 
+    /** Human-readable name shown in the GUI. */
     private final String displayName;
 
     /**

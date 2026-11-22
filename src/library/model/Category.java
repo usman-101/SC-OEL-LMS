@@ -23,6 +23,7 @@ public enum Category {
     /** Other category for miscellaneous books. */
     OTHER("Other");
 
+    /** Human-readable name shown in the GUI. */
     private final String displayName;
 
     /**

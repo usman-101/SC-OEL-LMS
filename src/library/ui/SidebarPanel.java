@@ -31,7 +31,7 @@ public class SidebarPanel extends JPanel {
     /** Container for bottom items (logout). */
     private final JPanel bottom = new JPanel();
     /** All navigation buttons. */
-    private final List<NavButton> buttons = new ArrayList<>();
+    private final transient List<NavButton> buttons = new ArrayList<>();
 
     /**
      * Creates a sidebar with a section title.

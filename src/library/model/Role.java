@@ -13,6 +13,7 @@ public enum Role {
     /** Student role with limited access. */
     STUDENT("Student");
 
+    /** Human-readable name shown in the GUI. */
     private final String displayName;
 
     /**

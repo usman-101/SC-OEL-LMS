@@ -652,6 +652,13 @@ public final class UIStyle {
         private static final long serialVersionUID = 1L;
 
         /**
+         * Creates the header renderer.
+         */
+        public HeaderRenderer() {
+            super();
+        }
+
+        /**
          * Returns the configured header component.
          *
          * @param table      the table

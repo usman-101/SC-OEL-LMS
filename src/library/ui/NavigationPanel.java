@@ -27,9 +27,9 @@ public abstract class NavigationPanel extends JPanel implements Refreshable {
     /** Container for the pages. */
     protected final JPanel content = new JPanel(cards);
     /** Pages by name, in sidebar order. */
-    private final Map<String, Refreshable> pages = new LinkedHashMap<>();
+    private final transient Map<String, Refreshable> pages = new LinkedHashMap<>();
     /** Sidebar buttons by page name. */
-    private final Map<String, JButton> navButtons = new LinkedHashMap<>();
+    private final transient Map<String, JButton> navButtons = new LinkedHashMap<>();
     /** The sidebar. */
     private final SidebarPanel sidebar;
 

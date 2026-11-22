@@ -9,11 +9,17 @@ package library.model;
  */
 public class Transaction {
 
+    /** Timestamp (yyyy-MM-dd HH:mm:ss). */
     private String dateTime;
+    /** Type of operation. */
     private TransactionType type;
+    /** Book involved (may be empty). */
     private String bookId;
+    /** Member involved (may be empty). */
     private String memberId;
+    /** Email of the user who performed the operation. */
     private String performedBy;
+    /** Human-readable details. */
     private String details;
 
     /**

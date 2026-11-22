@@ -9,13 +9,21 @@ package library.model;
  */
 public class Book {
 
+    /** Unique book ID, e.g. B001. */
     private String id;
+    /** Book title. */
     private String title;
+    /** Book author. */
     private String author;
+    /** Book category. */
     private Category category;
+    /** Current status (Available, Issued or Reserved). */
     private BookStatus status;
+    /** Member ID the book is issued to (empty if not issued). */
     private String issuedTo;
+    /** Due date (yyyy-MM-dd) while issued, otherwise empty. */
     private String dueDate;
+    /** Member ID that reserved the book (empty if not reserved). */
     private String reservedBy;
 
     /**

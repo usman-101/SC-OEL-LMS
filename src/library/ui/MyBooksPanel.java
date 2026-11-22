@@ -32,7 +32,7 @@ public class MyBooksPanel extends JPanel implements Refreshable {
     private final DefaultTableModel model = UIStyle.createTableModel(
             new String[]{"Book ID", "Title", "Author", "Type", "Issue Date", "Due Date", "Status"});
     /** Whether each model row is overdue. */
-    private final List<Boolean> overdueRows = new ArrayList<>();
+    private final transient List<Boolean> overdueRows = new ArrayList<>();
     /** Table. */
     private final JTable table = new JTable(model);
     /** Table or empty message. */

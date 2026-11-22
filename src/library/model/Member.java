@@ -9,9 +9,13 @@ package library.model;
  */
 public class Member {
 
+    /** Auto-generated member ID, e.g. MEM-001. */
     private String memberId;
+    /** Member's full name. */
     private String name;
+    /** Contact phone number (may be empty). */
     private String phone;
+    /** Contact email address (unique). */
     private String email;
 
     /**

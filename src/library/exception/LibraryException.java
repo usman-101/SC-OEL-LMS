@@ -10,6 +10,9 @@ package library.exception;
  */
 public class LibraryException extends Exception {
 
+    /** Serialization version. */
+    private static final long serialVersionUID = 1L;
+
     /**
      * Constructs a new LibraryException with the specified detail message.
      *

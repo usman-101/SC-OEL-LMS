@@ -51,7 +51,7 @@ public class IssueReturnPanel extends JPanel implements Refreshable {
     private final DefaultTableModel model = UIStyle.createTableModel(
             new String[]{"Book ID", "Title", "Member", "Issue Date", "Due Date", "Status"});
     /** Loans shown in the table, by model row. */
-    private final List<Loan> rows = new ArrayList<>();
+    private final transient List<Loan> rows = new ArrayList<>();
     /** Active loans table. */
     private final JTable table = new JTable(model);
     /** Table or empty message. */

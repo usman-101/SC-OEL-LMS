@@ -9,10 +9,15 @@ package library.model;
  */
 public class User {
 
+    /** User's full name. */
     private String fullName;
+    /** Login email (unique); also decides the role. */
     private String email;
+    /** SHA-256 hash of the password (never the plain password). */
     private String passwordHash;
+    /** Role derived from the email pattern. */
     private Role role;
+    /** Linked library member ID (students only). */
     private String memberId;
 
     /**
