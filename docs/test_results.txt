@@ -1,0 +1,167 @@
+==============================================================
+ Library Book Management System - Service Test Results
+ Run date: 2026-11-22   Java: 25.0.4.1
+==============================================================
+
+--- Required test cases (lab manual) ---
+[PASS] 01. Add a valid book -> book is added (status Available)
+        expected: Effective Java / Available
+        actual:   Effective Java / Available
+[PASS] 02. Add a book with an empty title -> validation error
+        expected: LibraryException containing "title cannot be empty"
+        actual:   LibraryException containing "title cannot be empty"
+[PASS] 03. Add a book with a duplicate ID -> error
+        expected: LibraryException containing "already exists"
+        actual:   LibraryException containing "already exists"
+[PASS] 04. View all books -> all books returned
+        expected: 3 books [B1, B2, B3]
+        actual:   3 books [B1, B2, B3]
+[PASS] 05. View an empty library -> empty list, isEmpty() true (GUI shows "The library is empty...")
+        expected: isEmpty=true, size=0
+        actual:   isEmpty=true, size=0
+[PASS] 06. Update an existing book -> details updated (and trimmed)
+        expected: Cosmos (2nd Ed.) / History
+        actual:   Cosmos (2nd Ed.) / History
+[PASS] 07. Update a non-existing book -> handled gracefully (no crash)
+        expected: LibraryException containing "not found"
+        actual:   LibraryException containing "not found"
+[PASS] 08. Delete an existing book -> book removed
+        expected: findById=null, size=2
+        actual:   findById=null, size=2
+
+--- Additional validation tests ---
+[PASS] 09. Add a book with an empty author -> validation error
+        expected: LibraryException containing "author cannot be empty"
+        actual:   LibraryException containing "author cannot be empty"
+[PASS] 10. Add a book with an empty ID -> validation error
+        expected: LibraryException containing "ID cannot be empty"
+        actual:   LibraryException containing "ID cannot be empty"
+[PASS] 11. Set status Available -> Reserved
+        expected: Reserved
+        actual:   Reserved
+[PASS] 12. Set the same status again -> error
+        expected: LibraryException containing "already Reserved"
+        actual:   LibraryException containing "already Reserved"
+[PASS] 13. Delete a non-existing book -> handled gracefully
+        expected: LibraryException containing "not found"
+        actual:   LibraryException containing "not found"
+[PASS] 14. Delete an issued book -> rejected
+        expected: LibraryException containing "currently issued"
+        actual:   LibraryException containing "currently issued"
+
+--- Issue / return / overdue ---
+[PASS] 15. Issue a book -> status Issued, issue and due date recorded
+        expected: ISSUED to MEM-001, issued 2026-11-22, due 2026-12-06
+        actual:   ISSUED to MEM-001, issued 2026-11-22, due 2026-12-06
+[PASS] 16. Issue to a non-existing member -> error
+        expected: LibraryException containing "not found"
+        actual:   LibraryException containing "not found"
+[PASS] 17. Issue an already issued book -> error
+        expected: LibraryException containing "already issued"
+        actual:   LibraryException containing "already issued"
+[PASS] 18. Return a book -> status automatically Available, return date recorded
+        expected: Available, returned 2026-11-22, active=false
+        actual:   Available, returned 2026-11-22, active=false
+[PASS] 19. Return the same loan twice -> error
+        expected: LibraryException containing "already been returned"
+        actual:   LibraryException containing "already been returned"
+[PASS] 20. Overdue detection -> only the late loan, 6 days overdue
+        expected: 1 overdue: B1, 6 days
+        actual:   1 overdue: B1, 6 days
+
+--- Search, filter and statistics ---
+[PASS] 21. Search by ID 'b2' (case-insensitive)
+        expected: [B2]
+        actual:   [B2]
+[PASS] 22. Search by title 'CAL' (partial)
+        expected: [B3]
+        actual:   [B3]
+[PASS] 23. Search by author 'sagan'
+        expected: [B2]
+        actual:   [B2]
+[PASS] 24. Filter by status Issued
+        expected: [B1]
+        actual:   [B1]
+[PASS] 25. Search + filter: status Available, category Science
+        expected: [B2]
+        actual:   [B2]
+[PASS] 26. Statistics counts correct
+        expected: total=3 available=1 issued=1 reserved=1 members=2 overdue=1
+        actual:   total=3 available=1 issued=1 reserved=1 members=2 overdue=1
+
+--- Members ---
+[PASS] 27. Member registration -> auto IDs MEM-001, MEM-002 (name trimmed)
+        expected: MEM-001 Usman, MEM-002 Hina
+        actual:   MEM-001 Usman, MEM-002 Hina
+[PASS] 28. Register a duplicate member email -> rejected
+        expected: LibraryException containing "already exists"
+        actual:   LibraryException containing "already exists"
+[PASS] 29. Register a member with an empty name -> rejected
+        expected: LibraryException containing "name cannot be empty"
+        actual:   LibraryException containing "name cannot be empty"
+[PASS] 30. Delete a member with active loans -> rejected
+        expected: LibraryException containing "active loans"
+        actual:   LibraryException containing "active loans"
+
+--- Authentication and roles ---
+[PASS] 31. Sign up valid student -> STUDENT with member MEM-001
+        expected: STUDENT MEM-001 member=Bilal
+        actual:   STUDENT MEM-001 member=Bilal
+[PASS] 32. Password stored as SHA-256 hash, not plain text
+        expected: 64 hex chars, not 'secret1'
+        actual:   64 hex chars, not 'secret1'
+[PASS] 33. Sign up with a duplicate email -> rejected
+        expected: LibraryException containing "already exists"
+        actual:   LibraryException containing "already exists"
+[PASS] 34. Sign up with a weak password (< 6 chars) -> rejected
+        expected: LibraryException containing "at least 6"
+        actual:   LibraryException containing "at least 6"
+[PASS] 35. Sign up with mismatched passwords -> rejected
+        expected: LibraryException containing "do not match"
+        actual:   LibraryException containing "do not match"
+[PASS] 36. Sign up with an invalid email -> rejected
+        expected: LibraryException containing "valid email"
+        actual:   LibraryException containing "valid email"
+[PASS] 37. Admin email pattern usman.admin@library.com -> ADMIN
+        expected: Admin
+        actual:   Admin
+[PASS] 38. Admin sign in -> ADMIN role
+        expected: Admin
+        actual:   Admin
+[PASS] 39. Normal email ali@gmail.com -> STUDENT
+        expected: Student
+        actual:   Student
+[PASS] 40. 'admin@library.com' (no <name>.admin) -> STUDENT
+        expected: Student
+        actual:   Student
+[PASS] 41. Sign in with a wrong password -> rejected
+        expected: LibraryException containing "Invalid email or password"
+        actual:   LibraryException containing "Invalid email or password"
+[PASS] 42. Admin sign up with a wrong access code -> rejected
+        expected: LibraryException containing "Admin Access Code"
+        actual:   LibraryException containing "Admin Access Code"
+
+--- Reservations, history and persistence ---
+[PASS] 43. Another member cannot issue a book reserved by someone else
+        expected: LibraryException containing "reserved by another member"
+        actual:   LibraryException containing "reserved by another member"
+[PASS] 44. Another member cannot cancel the reservation
+        expected: LibraryException containing "own reservations"
+        actual:   LibraryException containing "own reservations"
+[PASS] 45. Reserve + cancel reservation -> Reserved, then Available
+        expected: Reserved by MEM-001 -> Available
+        actual:   Reserved by MEM-001 -> Available
+[PASS] 46. Reserve a book that is not Available -> rejected
+        expected: LibraryException containing "cannot be reserved"
+        actual:   LibraryException containing "cannot be reserved"
+[PASS] 47. Transaction history records ISSUE and RETURN (newest first, performed by admin)
+        expected: 1 issue, 1 return, newest=Return by usman.admin@library.com
+        actual:   1 issue, 1 return, newest=Return by usman.admin@library.com
+[PASS] 48. Persistence: data saved to CSV files and loaded again (temp folder)
+        expected: 15 books, T1='Title, with comma' by Au "thor", 2 users, 1 overdue
+        actual:   15 books, T1='Title, with comma' by Au "thor", 2 users, 1 overdue
+
+==============================================================
+ SUMMARY: 48 checks, 48 PASSED, 0 FAILED
+ RESULT: ALL TESTS PASSED
+==============================================================
