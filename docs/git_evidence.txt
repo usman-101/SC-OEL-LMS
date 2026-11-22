@@ -1,11 +1,13 @@
 ==================== git status ====================
 On branch main
-Your branch is ahead of 'origin/main' by 14 commits.
+Your branch is ahead of 'origin/main' by 16 commits.
   (use "git push" to publish your local commits)
 
 nothing to commit, working tree clean
 
 ==================== git log --oneline ====================
+13f5ccc Restyle UI with liquid glass black and blue theme
+9042136 Add git evidence
 e44e009 Add test results and complete README
 1c5cfa1 Generate Javadoc HTML documentation
 d9b8581 Add Javadoc comments to all classes
@@ -31,145 +33,101 @@ de25f8c Add Book model, BookStatus and Category enums
  .project                                           |   17 +
  .settings/org.eclipse.core.resources.prefs         |    2 +
  .settings/org.eclipse.jdt.core.prefs               |    5 +
- README.md                                          |  161 +-
- docs/javadoc/allclasses-index.html                 |  267 ++
- docs/javadoc/allpackages-index.html                |   97 +
- docs/javadoc/constant-values.html                  |  500 ++++
- docs/javadoc/element-list                          |    6 +
- docs/javadoc/help-doc.html                         |  219 ++
- docs/javadoc/index-all.html                        | 2879 ++++++++++++++++++++
- docs/javadoc/index.html                            |   96 +
- docs/javadoc/legal/ADDITIONAL_LICENSE_INFO         |   37 +
- docs/javadoc/legal/ASSEMBLY_EXCEPTION              |   27 +
- docs/javadoc/legal/LICENSE                         |  347 +++
- docs/javadoc/legal/dejavufonts.md                  |  191 ++
- docs/javadoc/legal/jquery.md                       |   26 +
- docs/javadoc/legal/jqueryUI.md                     |   49 +
- docs/javadoc/library/Main.html                     |  247 ++
- .../library/exception/LibraryException.html        |  232 ++
- .../javadoc/library/exception/package-summary.html |  138 +
- docs/javadoc/library/exception/package-tree.html   |   81 +
- docs/javadoc/library/model/Book.html               |  686 +++++
- docs/javadoc/library/model/BookStatus.html         |  404 +++
- docs/javadoc/library/model/Category.html           |  461 ++++
- docs/javadoc/library/model/Loan.html               |  631 +++++
- docs/javadoc/library/model/Member.html             |  434 +++
- docs/javadoc/library/model/Role.html               |  391 +++
- docs/javadoc/library/model/Transaction.html        |  546 ++++
- docs/javadoc/library/model/TransactionType.html    |  474 ++++
- docs/javadoc/library/model/User.html               |  517 ++++
- docs/javadoc/library/model/package-summary.html    |  170 ++
- docs/javadoc/library/model/package-tree.html       |   94 +
- docs/javadoc/library/package-summary.html          |  145 +
- docs/javadoc/library/package-tree.html             |   73 +
- docs/javadoc/library/service/AuthService.html      |  493 ++++
- docs/javadoc/library/service/LibraryService.html   | 1579 +++++++++++
- docs/javadoc/library/service/LibrarySystem.html    |  445 +++
- docs/javadoc/library/service/MemberService.html    |  581 ++++
- .../library/service/TransactionService.html        |  372 +++
- docs/javadoc/library/service/package-summary.html  |  154 ++
- docs/javadoc/library/service/package-tree.html     |   77 +
- docs/javadoc/library/storage/DataStore.html        |  677 +++++
- docs/javadoc/library/storage/package-summary.html  |  136 +
- docs/javadoc/library/storage/package-tree.html     |   73 +
- docs/javadoc/library/ui/AdminPanel.html            |  258 ++
- docs/javadoc/library/ui/BooksPanel.html            |  681 +++++
- docs/javadoc/library/ui/BrowseBooksPanel.html      |  437 +++
- docs/javadoc/library/ui/DashboardPanel.html        |  436 +++
- docs/javadoc/library/ui/IssueReturnPanel.html      |  543 ++++
- .../library/ui/LoginFrame.BrandingPanel.html       |  287 ++
- docs/javadoc/library/ui/LoginFrame.html            |  564 ++++
- docs/javadoc/library/ui/MainFrame.html             |  534 ++++
- docs/javadoc/library/ui/MembersPanel.html          |  536 ++++
- docs/javadoc/library/ui/MyBooksPanel.html          |  385 +++
- docs/javadoc/library/ui/MyHistoryPanel.html        |  370 +++
- docs/javadoc/library/ui/NavigationPanel.html       |  472 ++++
- docs/javadoc/library/ui/OverduePanel.html          |  391 +++
- docs/javadoc/library/ui/Refreshable.html           |  135 +
- docs/javadoc/library/ui/SearchFilterBar.html       |  454 +++
- .../javadoc/library/ui/SidebarPanel.NavButton.html |  342 +++
- docs/javadoc/library/ui/SidebarPanel.html          |  420 +++
- docs/javadoc/library/ui/SignUpPanel.html           |  553 ++++
- docs/javadoc/library/ui/StatCard.html              |  369 +++
- docs/javadoc/library/ui/StudentPanel.html          |  437 +++
- docs/javadoc/library/ui/TableCard.html             |  438 +++
- docs/javadoc/library/ui/TransactionsPanel.html     |  405 +++
- docs/javadoc/library/ui/UIStyle.EmojiIcon.html     |  324 +++
- docs/javadoc/library/ui/UIStyle.FlatButton.html    |  329 +++
- .../javadoc/library/ui/UIStyle.HeaderRenderer.html |  329 +++
- docs/javadoc/library/ui/UIStyle.RoundedPanel.html  |  355 +++
- .../library/ui/UIStyle.StripedRenderer.html        |  348 +++
- docs/javadoc/library/ui/UIStyle.html               | 1140 ++++++++
- docs/javadoc/library/ui/package-summary.html       |  266 ++
- docs/javadoc/library/ui/package-tree.html          |  155 ++
- docs/javadoc/member-search-index.js                |    1 +
- docs/javadoc/module-search-index.js                |    1 +
- docs/javadoc/overview-summary.html                 |   26 +
- docs/javadoc/overview-tree.html                    |  195 ++
- docs/javadoc/package-search-index.js               |    1 +
- docs/javadoc/resource-files/copy.svg               |   15 +
- .../resource-files/fonts/DejaVuLGCSans-Bold.woff   |  Bin 0 -> 280908 bytes
- .../resource-files/fonts/DejaVuLGCSans-Bold.woff2  |  Bin 0 -> 193392 bytes
- .../fonts/DejaVuLGCSans-BoldOblique.woff           |  Bin 0 -> 276608 bytes
- .../fonts/DejaVuLGCSans-BoldOblique.woff2          |  Bin 0 -> 193548 bytes
- .../fonts/DejaVuLGCSans-Oblique.woff               |  Bin 0 -> 273920 bytes
- .../fonts/DejaVuLGCSans-Oblique.woff2              |  Bin 0 -> 192368 bytes
- .../resource-files/fonts/DejaVuLGCSans.woff        |  Bin 0 -> 300804 bytes
- .../resource-files/fonts/DejaVuLGCSans.woff2       |  Bin 0 -> 208088 bytes
- .../fonts/DejaVuLGCSansMono-Bold.woff              |  Bin 0 -> 166156 bytes
- .../fonts/DejaVuLGCSansMono-Bold.woff2             |  Bin 0 -> 120496 bytes
- .../fonts/DejaVuLGCSansMono-BoldOblique.woff       |  Bin 0 -> 131976 bytes
- .../fonts/DejaVuLGCSansMono-BoldOblique.woff2      |  Bin 0 -> 93508 bytes
- .../fonts/DejaVuLGCSansMono-Oblique.woff           |  Bin 0 -> 131844 bytes
- .../fonts/DejaVuLGCSansMono-Oblique.woff2          |  Bin 0 -> 94024 bytes
- .../resource-files/fonts/DejaVuLGCSansMono.woff    |  Bin 0 -> 170212 bytes
- .../resource-files/fonts/DejaVuLGCSansMono.woff2   |  Bin 0 -> 123560 bytes
- .../resource-files/fonts/DejaVuLGCSerif-Bold.woff  |  Bin 0 -> 167488 bytes
- .../resource-files/fonts/DejaVuLGCSerif-Bold.woff2 |  Bin 0 -> 112512 bytes
- .../fonts/DejaVuLGCSerif-BoldItalic.woff           |  Bin 0 -> 165488 bytes
- .../fonts/DejaVuLGCSerif-BoldItalic.woff2          |  Bin 0 -> 113032 bytes
- .../fonts/DejaVuLGCSerif-Italic.woff               |  Bin 0 -> 166552 bytes
- .../fonts/DejaVuLGCSerif-Italic.woff2              |  Bin 0 -> 113988 bytes
- .../resource-files/fonts/DejaVuLGCSerif.woff       |  Bin 0 -> 186428 bytes
- .../resource-files/fonts/DejaVuLGCSerif.woff2      |  Bin 0 -> 127416 bytes
- docs/javadoc/resource-files/fonts/dejavu.css       |  104 +
- docs/javadoc/resource-files/glass.svg              |   13 +
- docs/javadoc/resource-files/jquery-ui.min.css      |    6 +
- docs/javadoc/resource-files/left.svg               |   12 +
- docs/javadoc/resource-files/link.svg               |   13 +
- docs/javadoc/resource-files/right.svg              |   12 +
- docs/javadoc/resource-files/stylesheet.css         | 1667 ++++++++++++
- docs/javadoc/resource-files/x.svg                  |   13 +
- docs/javadoc/script-files/jquery-3.7.1.min.js      |    2 +
- docs/javadoc/script-files/jquery-ui.min.js         |    6 +
- docs/javadoc/script-files/script.js                |  585 ++++
- docs/javadoc/script-files/search-page.js           |  348 +++
- docs/javadoc/script-files/search.js                |  549 ++++
- docs/javadoc/search.html                           |   78 +
- docs/javadoc/serialized-form.html                  | 1007 +++++++
- docs/javadoc/tag-search-index.js                   |    1 +
- docs/javadoc/type-search-index.js                  |    1 +
- docs/test_results.txt                              |  167 ++
- src/library/exception/LibraryException.java        |    3 +
- src/library/exception/package-info.java            |    7 +
- src/library/model/Book.java                        |    8 +
- src/library/model/BookStatus.java                  |    1 +
- src/library/model/Category.java                    |    1 +
- src/library/model/Loan.java                        |    7 +
- src/library/model/Member.java                      |    4 +
- src/library/model/Role.java                        |    1 +
- src/library/model/Transaction.java                 |    6 +
- src/library/model/TransactionType.java             |    1 +
- src/library/model/User.java                        |    5 +
- src/library/model/package-info.java                |    9 +
- src/library/package-info.java                      |   15 +
- src/library/service/LibraryService.java            |    3 +
- src/library/service/package-info.java              |   10 +
- src/library/storage/package-info.java              |    7 +
+ README.md                                          |  170 +++-
+ docs/git_evidence.txt                              |  175 ++++
+ docs/javadoc/allclasses-index.html                 |  107 ++-
+ docs/javadoc/allpackages-index.html                |    2 +-
+ docs/javadoc/constant-values.html                  |   79 +-
+ docs/javadoc/help-doc.html                         |    2 +-
+ docs/javadoc/index-all.html                        |  411 +++++++-
+ docs/javadoc/index.html                            |    2 +-
+ docs/javadoc/library/Main.html                     |    2 +-
+ .../library/exception/LibraryException.html        |    2 +-
+ .../javadoc/library/exception/package-summary.html |    2 +-
+ docs/javadoc/library/exception/package-tree.html   |    2 +-
+ docs/javadoc/library/model/Book.html               |    2 +-
+ docs/javadoc/library/model/BookStatus.html         |    2 +-
+ docs/javadoc/library/model/Category.html           |    2 +-
+ docs/javadoc/library/model/Loan.html               |    2 +-
+ docs/javadoc/library/model/Member.html             |    2 +-
+ docs/javadoc/library/model/Role.html               |    2 +-
+ docs/javadoc/library/model/Transaction.html        |    2 +-
+ docs/javadoc/library/model/TransactionType.html    |    2 +-
+ docs/javadoc/library/model/User.html               |    2 +-
+ docs/javadoc/library/model/package-summary.html    |    2 +-
+ docs/javadoc/library/model/package-tree.html       |    2 +-
+ docs/javadoc/library/package-summary.html          |    2 +-
+ docs/javadoc/library/package-tree.html             |    2 +-
+ docs/javadoc/library/service/AuthService.html      |    2 +-
+ docs/javadoc/library/service/LibraryService.html   |    2 +-
+ docs/javadoc/library/service/LibrarySystem.html    |    2 +-
+ docs/javadoc/library/service/MemberService.html    |    2 +-
+ .../library/service/TransactionService.html        |    2 +-
+ docs/javadoc/library/service/package-summary.html  |    2 +-
+ docs/javadoc/library/service/package-tree.html     |    2 +-
+ docs/javadoc/library/storage/DataStore.html        |    2 +-
+ docs/javadoc/library/storage/package-summary.html  |    2 +-
+ docs/javadoc/library/storage/package-tree.html     |    2 +-
+ docs/javadoc/library/ui/AdminPanel.html            |    2 +-
+ docs/javadoc/library/ui/BooksPanel.html            |    2 +-
+ docs/javadoc/library/ui/BrowseBooksPanel.html      |    2 +-
+ docs/javadoc/library/ui/DashboardPanel.html        |    2 +-
+ docs/javadoc/library/ui/GlassBackground.html       |  325 +++++++
+ docs/javadoc/library/ui/IssueReturnPanel.html      |    2 +-
+ .../library/ui/LoginFrame.BrandingPanel.html       |   45 +-
+ .../library/ui/LoginFrame.GradientLabel.html       |  300 ++++++
+ docs/javadoc/library/ui/LoginFrame.html            |   10 +-
+ docs/javadoc/library/ui/MainFrame.html             |    2 +-
+ docs/javadoc/library/ui/MembersPanel.html          |    2 +-
+ docs/javadoc/library/ui/MyBooksPanel.html          |    2 +-
+ docs/javadoc/library/ui/MyHistoryPanel.html        |    2 +-
+ docs/javadoc/library/ui/NavigationPanel.html       |    2 +-
+ docs/javadoc/library/ui/OverduePanel.html          |    2 +-
+ docs/javadoc/library/ui/Refreshable.html           |    2 +-
+ docs/javadoc/library/ui/SearchFilterBar.html       |    2 +-
+ .../javadoc/library/ui/SidebarPanel.NavButton.html |    6 +-
+ docs/javadoc/library/ui/SidebarPanel.html          |   37 +-
+ docs/javadoc/library/ui/SignUpPanel.html           |    2 +-
+ docs/javadoc/library/ui/StatCard.html              |   12 +-
+ docs/javadoc/library/ui/StudentPanel.html          |    2 +-
+ docs/javadoc/library/ui/TableCard.html             |    2 +-
+ docs/javadoc/library/ui/TransactionsPanel.html     |    2 +-
+ docs/javadoc/library/ui/UIStyle.ArrowButton.html   |  326 +++++++
+ docs/javadoc/library/ui/UIStyle.EmojiIcon.html     |    2 +-
+ docs/javadoc/library/ui/UIStyle.FlatButton.html    |   17 +-
+ .../library/ui/UIStyle.GlassComboBoxUI.html        |  285 ++++++
+ .../library/ui/UIStyle.GlassListRenderer.html      |  318 ++++++
+ .../library/ui/UIStyle.GlassPasswordField.html     |  322 +++++++
+ .../library/ui/UIStyle.GlassScrollBarUI.html       |  345 +++++++
+ .../javadoc/library/ui/UIStyle.GlassSpinnerUI.html |  254 +++++
+ .../javadoc/library/ui/UIStyle.GlassTextField.html |  314 ++++++
+ .../javadoc/library/ui/UIStyle.HeaderRenderer.html |    5 +-
+ docs/javadoc/library/ui/UIStyle.LiquidDotIcon.html |  305 ++++++
+ .../library/ui/UIStyle.RoundedFieldBorder.html     |  346 +++++++
+ docs/javadoc/library/ui/UIStyle.RoundedPanel.html  |   23 +-
+ .../library/ui/UIStyle.StripedRenderer.html        |    4 +-
+ docs/javadoc/library/ui/UIStyle.html               |  623 +++++++++---
+ docs/javadoc/library/ui/package-summary.html       |   89 +-
+ docs/javadoc/library/ui/package-tree.html          |   57 +-
+ docs/javadoc/member-search-index.js                |    2 +-
+ docs/javadoc/overview-summary.html                 |    2 +-
+ docs/javadoc/overview-tree.html                    |   57 +-
+ docs/javadoc/search.html                           |    2 +-
+ docs/javadoc/serialized-form.html                  |   94 +-
+ docs/javadoc/type-search-index.js                  |    2 +-
+ docs/test_results.txt                              |  167 ++++
+ src/library/Main.java                              |    8 +-
+ src/library/ui/DashboardPanel.java                 |    2 +-
+ src/library/ui/GlassBackground.java                |   76 ++
  src/library/ui/IssueReturnPanel.java               |    2 +-
- src/library/ui/MyBooksPanel.java                   |    2 +-
+ src/library/ui/LoginFrame.java                     |   98 +-
+ src/library/ui/MainFrame.java                      |   25 +-
+ src/library/ui/MembersPanel.java                   |    1 -
  src/library/ui/NavigationPanel.java                |    4 +-
- src/library/ui/SidebarPanel.java                   |    2 +-
- src/library/ui/UIStyle.java                        |    7 +
- src/library/ui/package-info.java                   |   11 +
- 145 files changed, 32829 insertions(+), 47 deletions(-)
+ src/library/ui/SidebarPanel.java                   |   49 +-
+ src/library/ui/SignUpPanel.java                    |    8 +-
+ src/library/ui/StatCard.java                       |   42 +-
+ src/library/ui/StudentPanel.java                   |   14 +-
+ src/library/ui/TableCard.java                      |    6 +-
+ src/library/ui/UIStyle.java                        | 1009 ++++++++++++++++++--
+ 101 files changed, 6559 insertions(+), 548 deletions(-)
